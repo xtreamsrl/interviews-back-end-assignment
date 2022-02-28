@@ -1,0 +1,52 @@
+package it.ms.backendassignment.model;
+
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Entity
+@Table(name = "comments")
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
+@NoArgsConstructor
+public class Comment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
+    private Long id;
+
+    @Column(columnDefinition = "TEXT")
+    @NonNull
+    private String text;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @NonNull
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDate creationDate;
+
+    @NonNull
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDate updateDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Comment comment = (Comment) o;
+        return id != null && Objects.equals(id, comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}
