@@ -5,7 +5,7 @@ import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -32,11 +32,11 @@ public class Post {
 
     @NonNull
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 
     @NonNull
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "post")
     @ToString.Exclude
