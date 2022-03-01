@@ -1,11 +1,12 @@
 package it.ms.backendassignment.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -27,15 +28,16 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonBackReference
     private Post post;
 
     @NonNull
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 
     @NonNull
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 
     @Override
     public boolean equals(Object o) {

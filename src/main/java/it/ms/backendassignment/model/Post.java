@@ -1,5 +1,6 @@
 package it.ms.backendassignment.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
@@ -40,6 +41,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     @ToString.Exclude
+    @JsonManagedReference
     private Set<Comment> comments;
 
     public void addComment(Comment comment) {
