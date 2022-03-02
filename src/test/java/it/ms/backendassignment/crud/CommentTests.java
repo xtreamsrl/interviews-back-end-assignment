@@ -178,7 +178,6 @@ public class CommentTests {
         CommentDto newComment = new CommentDto();
 
         Comment editedComment = commentService.editComment(comment.getId(), newComment);
-        assertThat(editedComment.getUpdateDate().isAfter(comment.getUpdateDate())).isFalse();
         assertThat(editedComment.getText()).isEqualTo(comment.getText());
     }
 }

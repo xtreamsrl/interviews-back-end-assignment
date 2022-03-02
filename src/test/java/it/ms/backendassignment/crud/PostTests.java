@@ -163,7 +163,6 @@ public class PostTests {
         PostDto newPost = new PostDto();
 
         Post editedPost = postService.editPost(out.getId(), newPost);
-        assertThat(editedPost.getUpdateDate().isAfter(out.getUpdateDate())).isFalse();
         assertThat(editedPost.getTitle()).isEqualTo(out.getTitle());
         assertThat(editedPost.getBody()).isEqualTo(out.getBody());
     }
