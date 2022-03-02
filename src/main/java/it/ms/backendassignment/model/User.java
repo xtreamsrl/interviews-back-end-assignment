@@ -6,52 +6,60 @@ import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "posts")
-@NoArgsConstructor
+@Table(name = "users")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Post {
+@NoArgsConstructor
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "user_id")
     private Long id;
 
+    @Column(unique = true)
     @NonNull
-    private String title;
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     @NonNull
-    private String body;
+    private String password;
 
-    @NonNull
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime creationDate;
-
-    @NonNull
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime updateDate;
-
-    @OneToMany(mappedBy = "post")
-    @ToString.Exclude
+    @OneToMany(mappedBy = "user")
     @JsonManagedReference
+    @ToString.Exclude
+    private Set<Post> posts;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    @ToString.Exclude
     private Set<Comment> comments;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    public void addPost(Post post) {
+        post.setUser(this);
+
+        if (Objects.isNull(this.posts)) {
+            this.posts = new HashSet<>();
+        }
+
+        this.posts.add(post);
+    }
+
+    public void removePost(Post post) {
+        this.posts.remove(post);
+        post.setUser(null);
+    }
 
     public void addComment(Comment comment) {
-        comment.setPost(this);
+        comment.setUser(this);
 
-        if (Objects.isNull(this.comments)) {
+        if (Objects.isNull(this.posts)) {
             this.comments = new HashSet<>();
         }
 
@@ -60,15 +68,15 @@ public class Post {
 
     public void removeComment(Comment comment) {
         this.comments.remove(comment);
-        comment.setPost(null);
+        comment.setUser(null);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Post post = (Post) o;
-        return id != null && Objects.equals(id, post.id);
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
     }
 
     @Override

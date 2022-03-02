@@ -10,7 +10,6 @@ import java.util.List;
 
 @Component
 public interface PostService {
-
     Post createPost(PostDto postDtoIn) throws BAException;
 
     Post getPostById(Long postId) throws BAException;

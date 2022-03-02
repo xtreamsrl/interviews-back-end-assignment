@@ -39,6 +39,11 @@ public class Comment {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime updateDate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
