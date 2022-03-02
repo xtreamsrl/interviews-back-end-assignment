@@ -1,6 +1,6 @@
 package it.ms.backendassignment.service;
 
-import it.ms.backendassignment.dto.DeletePostDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Post;
@@ -17,7 +17,7 @@ public interface PostService {
 
     List<Post> getPosts(Integer pageNo, Integer pageSize);
 
-    DeletePostDto deletePost(Long postId);
+    DeleteDto deletePost(Long postId);
 
     Post editPost(Long postId, PostDto newPost) throws BAException;
 }

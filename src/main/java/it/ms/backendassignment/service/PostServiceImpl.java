@@ -1,7 +1,7 @@
 package it.ms.backendassignment.service;
 
 import it.ms.backendassignment.constants.Constants;
-import it.ms.backendassignment.dto.DeletePostDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Post;
@@ -65,40 +65,36 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public DeletePostDto deletePost(Long postId) {
-        DeletePostDto deletePostDto = new DeletePostDto();
+    public DeleteDto deletePost(Long postId) {
+        DeleteDto deleteDto = new DeleteDto();
 
         if (postRepository.findById(postId).isPresent()) {
             postRepository.deleteById(postId);
 
-            deletePostDto.setMessage("Deleted post with id: " + postId);
-            deletePostDto.setSuccess(Boolean.TRUE);
+            deleteDto.setMessage("Deleted post with id: " + postId);
+            deleteDto.setSuccess(Boolean.TRUE);
         } else {
-            deletePostDto.setMessage("Could not delete post with id: " + postId);
-            deletePostDto.setSuccess(Boolean.FALSE);
+            deleteDto.setMessage("Could not delete post with id: " + postId);
+            deleteDto.setSuccess(Boolean.FALSE);
         }
 
-        return deletePostDto;
+        return deleteDto;
     }
 
     @Override
     @Transactional
     public Post editPost(Long postId, PostDto newPost) throws BAException {
-        if (postRepository.findById(postId).isPresent()) {
-            Post oldPost = postRepository.findById(postId).get();
-            boolean edited = StringUtils.isNotBlank(newPost.getTitle()) || StringUtils.isNotBlank(newPost.getBody());
+        Post oldPost = this.getPostById(postId);
+        boolean edited = StringUtils.isNotBlank(newPost.getTitle()) || StringUtils.isNotBlank(newPost.getBody());
 
-            Optional.of(newPost).map(PostDto::getTitle).ifPresent(oldPost::setTitle);
-            Optional.of(newPost).map(PostDto::getBody).ifPresent(oldPost::setBody);
+        Optional.of(newPost).map(PostDto::getTitle).ifPresent(oldPost::setTitle);
+        Optional.of(newPost).map(PostDto::getBody).ifPresent(oldPost::setBody);
 
-            if (edited) {
-                oldPost.setUpdateDate(LocalDateTime.now());
-                postRepository.save(oldPost);
-            }
-
-            return oldPost;
+        if (edited) {
+            oldPost.setUpdateDate(LocalDateTime.now());
+            postRepository.save(oldPost);
         }
 
-        throw new BAException(Constants.POST_NOT_FOUND + " id: " + postId, HttpStatus.NOT_FOUND);
+        return oldPost;
     }
 }

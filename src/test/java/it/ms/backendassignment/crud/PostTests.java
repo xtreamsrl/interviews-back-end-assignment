@@ -1,7 +1,7 @@
 package it.ms.backendassignment.crud;
 
 import it.ms.backendassignment.constants.Constants;
-import it.ms.backendassignment.dto.DeletePostDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Post;
@@ -125,14 +125,14 @@ public class PostTests {
         postIn.setBody("A pretty body");
         Post out = postService.createPost(postIn);
 
-        DeletePostDto deletePostDto = postService.deletePost(out.getId());
+        DeleteDto deleteDto = postService.deletePost(out.getId());
 
-        assertThat(deletePostDto.getSuccess()).isTrue();
+        assertThat(deleteDto.getSuccess()).isTrue();
     }
     @Test
     void shouldntDeletePost() {
-        DeletePostDto deletePostDto = postService.deletePost(2L);
-        assertThat(deletePostDto.getSuccess()).isFalse();
+        DeleteDto deleteDto = postService.deletePost(2L);
+        assertThat(deleteDto.getSuccess()).isFalse();
     }
 
     @Test
@@ -148,7 +148,7 @@ public class PostTests {
 
         Post editedPost = postService.editPost(out.getId(), newPost);
 
-        assertThat(editedPost.getTitle()).isEqualTo("An even prettier title");
+        assertThat(editedPost.getTitle()).isEqualTo(editedPost.getTitle());
         assertThat(editedPost.getBody()).isEqualTo(out.getBody());
         assertThat(editedPost.getUpdateDate().isAfter(out.getUpdateDate())).isTrue();
     }
@@ -164,5 +164,7 @@ public class PostTests {
 
         Post editedPost = postService.editPost(out.getId(), newPost);
         assertThat(editedPost.getUpdateDate().isAfter(out.getUpdateDate())).isFalse();
+        assertThat(editedPost.getTitle()).isEqualTo(out.getTitle());
+        assertThat(editedPost.getBody()).isEqualTo(out.getBody());
     }
 }

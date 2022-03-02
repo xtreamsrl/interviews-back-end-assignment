@@ -2,6 +2,7 @@ package it.ms.backendassignment.service;
 
 import it.ms.backendassignment.constants.Constants;
 import it.ms.backendassignment.dto.CommentDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Comment;
 import it.ms.backendassignment.model.Post;
@@ -71,5 +72,36 @@ public class CommentServiceImpl implements CommentService {
     public Comment getCommentById(Long commentId) throws BAException {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new BAException(Constants.COMMENT_NOT_FOUND + " id: " + commentId, HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public DeleteDto deleteComment(Long commentId) {
+        DeleteDto deleteDto = new DeleteDto();
+
+        if (commentRepository.findById(commentId).isPresent()) {
+            commentRepository.deleteById(commentId);
+
+            deleteDto.setMessage("Deleted comment with id: " + commentId);
+            deleteDto.setSuccess(Boolean.TRUE);
+        } else {
+            deleteDto.setMessage("Could not delete comment with id: " + commentId);
+            deleteDto.setSuccess(Boolean.FALSE);
+        }
+
+        return deleteDto;
+    }
+
+    @Override
+    public Comment editComment(Long commentId, CommentDto newComment) throws BAException {
+        Comment oldComment = this.getCommentById(commentId);
+
+        if (StringUtils.isNotBlank(newComment.getText())) {
+            oldComment.setUpdateDate(LocalDateTime.now());
+            oldComment.setText(newComment.getText());
+
+            commentRepository.save(oldComment);
+        }
+
+        return oldComment;
     }
 }

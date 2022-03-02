@@ -2,6 +2,7 @@ package it.ms.backendassignment.crud;
 
 import it.ms.backendassignment.constants.Constants;
 import it.ms.backendassignment.dto.CommentDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Comment;
@@ -112,5 +113,72 @@ public class CommentTests {
         assertThatThrownBy(() -> commentService.getCommentById(23L))
                 .isInstanceOf(BAException.class)
                 .hasMessageStartingWith(Constants.COMMENT_NOT_FOUND);
+    }
+
+    @Test
+    void shouldDeleteComment() throws BAException {
+        PostDto postIn = new PostDto();
+        postIn.setTitle("A pretty title");
+        postIn.setBody("A pretty body");
+        Post out = postService.createPost(postIn);
+
+        CommentDto commentIn = new CommentDto();
+        commentIn.setPostId(out.getId());
+        commentIn.setText("This is a comment");
+
+        Comment comment = commentService.createComment(commentIn);
+
+        DeleteDto deleteDto = commentService.deleteComment(comment.getId());
+
+        assertThat(deleteDto.getSuccess()).isTrue();
+    }
+
+    @Test
+    void shouldntDeletePost() {
+        DeleteDto deleteDto = commentService.deleteComment(2L);
+        assertThat(deleteDto.getSuccess()).isFalse();
+    }
+
+    @Test
+    void shouldUpdateComment() throws BAException {
+        PostDto postIn = new PostDto();
+        postIn.setTitle("A pretty title");
+        postIn.setBody("A pretty body");
+        Post out = postService.createPost(postIn);
+
+        CommentDto commentIn = new CommentDto();
+        commentIn.setPostId(out.getId());
+        commentIn.setText("This is a comment");
+
+        Comment comment = commentService.createComment(commentIn);
+
+        CommentDto newComment = new CommentDto();
+        newComment.setPostId(comment.getId());
+        newComment.setText("Edited text");
+
+        Comment editedComment = commentService.editComment(comment.getId(), newComment);
+
+        assertThat(editedComment.getText()).isEqualTo(newComment.getText());
+        assertThat(editedComment.getUpdateDate().isAfter(out.getUpdateDate())).isTrue();
+    }
+
+    @Test
+    void shouldntUpdateComment() throws BAException {
+        PostDto postIn = new PostDto();
+        postIn.setTitle("A pretty title");
+        postIn.setBody("A pretty body");
+        Post out = postService.createPost(postIn);
+
+        CommentDto commentIn = new CommentDto();
+        commentIn.setPostId(out.getId());
+        commentIn.setText("This is a comment");
+
+        Comment comment = commentService.createComment(commentIn);
+
+        CommentDto newComment = new CommentDto();
+
+        Comment editedComment = commentService.editComment(comment.getId(), newComment);
+        assertThat(editedComment.getUpdateDate().isAfter(comment.getUpdateDate())).isFalse();
+        assertThat(editedComment.getText()).isEqualTo(comment.getText());
     }
 }

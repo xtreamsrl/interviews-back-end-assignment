@@ -1,6 +1,6 @@
 package it.ms.backendassignment.controller;
 
-import it.ms.backendassignment.dto.DeletePostDto;
+import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Post;
@@ -40,9 +40,9 @@ public class PostController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<DeletePostDto> deletePostById(@PathVariable Long id) {
-        DeletePostDto deletePostDto = postService.deletePost(id);
-        return ResponseEntity.ok(deletePostDto);
+    public ResponseEntity<DeleteDto> deletePostById(@PathVariable Long id) {
+        DeleteDto deleteDto = postService.deletePost(id);
+        return ResponseEntity.ok(deleteDto);
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
