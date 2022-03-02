@@ -11,5 +11,7 @@ import java.util.List;
 public interface CommentService {
     Comment createComment(CommentDto commentIn) throws BAException;
 
-    List<Comment> getCommentsFromPost(Long postId) throws BAException;
+    List<Comment> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId);
+
+    Comment getCommentById(Long commentId) throws BAException;
 }

@@ -8,7 +8,12 @@ import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = new Comment();
 
-        comment.setPost(postById);
-        comment.setText(commentIn.getText());
+        BeanUtils.copyProperties(commentIn, comment);
         comment.setCreationDate(LocalDateTime.now());
         comment.setUpdateDate(LocalDateTime.now());
 
@@ -55,8 +59,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentsFromPost(Long postId) throws BAException {
-        Post postById = postService.getPostById(postId);
-        return new ArrayList<>(postById.getComments());
+    public List<Comment> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId) {
+        Pageable pagination = PageRequest.of(pageNo, pageSize, Sort.by("updateDate").descending());
+
+        Page<Comment> pagedResult = commentRepository.findByPostId(pagination, postId);
+
+        return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
+    }
+
+    @Override
+    public Comment getCommentById(Long commentId) throws BAException {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new BAException(Constants.COMMENT_NOT_FOUND + " id: " + commentId, HttpStatus.NOT_FOUND));
     }
 }

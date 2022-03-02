@@ -37,20 +37,16 @@ public class PostServiceImpl implements PostService {
         if (StringUtils.isBlank(postDtoIn.getTitle()) || StringUtils.isBlank(postDtoIn.getBody())) {
             throw new BAException(Constants.BAD_TITLE_OR_BODY, HttpStatus.BAD_REQUEST);
         }
-        try {
-            Post postTmp = new Post();
-            BeanUtils.copyProperties(postDtoIn, postTmp);
-            postTmp.setCreationDate(LocalDateTime.now());
-            postTmp.setUpdateDate(LocalDateTime.now());
 
-            Post out = postRepository.save(postTmp);
-            log.info("Saved post: {}", out);
-            return out;
-        } catch (Exception e) {
-            throw new BAException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Post postTmp = new Post();
 
+        BeanUtils.copyProperties(postDtoIn, postTmp);
+        postTmp.setCreationDate(LocalDateTime.now());
+        postTmp.setUpdateDate(LocalDateTime.now());
 
+        Post out = postRepository.save(postTmp);
+        log.info("Saved post: {}", out);
+        return out;
     }
 
     @Override
@@ -90,10 +86,16 @@ public class PostServiceImpl implements PostService {
     public Post editPost(Long postId, PostDto newPost) throws BAException {
         if (postRepository.findById(postId).isPresent()) {
             Post oldPost = postRepository.findById(postId).get();
+            boolean edited = StringUtils.isNotBlank(newPost.getTitle()) || StringUtils.isNotBlank(newPost.getBody());
 
-            Optional.ofNullable(newPost).map(PostDto::getTitle).ifPresent(oldPost::setTitle);
-            Optional.ofNullable(newPost).map(PostDto::getBody).ifPresent(oldPost::setBody);
-            postRepository.save(oldPost);
+            Optional.of(newPost).map(PostDto::getTitle).ifPresent(oldPost::setTitle);
+            Optional.of(newPost).map(PostDto::getBody).ifPresent(oldPost::setBody);
+
+            if (edited) {
+                oldPost.setUpdateDate(LocalDateTime.now());
+                postRepository.save(oldPost);
+            }
+
             return oldPost;
         }
 

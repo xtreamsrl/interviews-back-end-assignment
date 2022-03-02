@@ -26,8 +26,16 @@ public class CommentController {
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Comment>> getCommentsFromPost(@RequestParam Long postId) throws BAException {
-        List<Comment> comments = commentService.getCommentsFromPost(postId);
+    public ResponseEntity<List<Comment>> getCommentsFromPost(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                             @RequestParam(defaultValue = "5") Integer pageSize,
+                                                             @RequestParam Long postId) {
+        List<Comment> comments = commentService.getCommentsFromPost(pageNo, pageSize, postId);
         return ResponseEntity.ok(comments);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
+    public ResponseEntity<Comment> getCommentById(@PathVariable Long id) throws BAException {
+        Comment comment = commentService.getCommentById(id);
+        return ResponseEntity.ok().body(comment);
     }
 }

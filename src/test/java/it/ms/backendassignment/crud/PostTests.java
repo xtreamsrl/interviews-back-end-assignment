@@ -150,5 +150,19 @@ public class PostTests {
 
         assertThat(editedPost.getTitle()).isEqualTo("An even prettier title");
         assertThat(editedPost.getBody()).isEqualTo(out.getBody());
+        assertThat(editedPost.getUpdateDate().isAfter(out.getUpdateDate())).isTrue();
+    }
+
+    @Test
+    void shouldntUpdatePost() throws BAException {
+        PostDto postIn = new PostDto();
+        postIn.setTitle("A pretty title");
+        postIn.setBody("A pretty body");
+        Post out = postService.createPost(postIn);
+
+        PostDto newPost = new PostDto();
+
+        Post editedPost = postService.editPost(out.getId(), newPost);
+        assertThat(editedPost.getUpdateDate().isAfter(out.getUpdateDate())).isFalse();
     }
 }

@@ -1,5 +1,6 @@
 package it.ms.backendassignment.crud;
 
+import it.ms.backendassignment.constants.Constants;
 import it.ms.backendassignment.dto.CommentDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @SpringBootTest
@@ -82,8 +84,33 @@ public class CommentTests {
 
         assertThat(postAfterComment.getComments()).hasSize(2);
 
-        List<Comment> commentsFromPost = commentService.getCommentsFromPost(out.getId());
-        assertThat(commentsFromPost).isNotNull().hasSize(2);
+        List<Comment> firstCommentPage = commentService.getCommentsFromPost(0, 1, out.getId());
 
+        assertThat(firstCommentPage).hasSize(1);
+    }
+
+    @Test
+    void shouldGetCommentById() throws BAException {
+        PostDto postIn = new PostDto();
+        postIn.setTitle("A pretty title");
+        postIn.setBody("A pretty body");
+        Post out = postService.createPost(postIn);
+
+        CommentDto commentIn = new CommentDto();
+        commentIn.setPostId(out.getId());
+        commentIn.setText("This is a comment");
+
+        Comment comment = commentService.createComment(commentIn);
+
+        Comment commentById = commentService.getCommentById(comment.getId());
+
+        assertThat(commentById.getId()).isEqualTo(comment.getId());
+    }
+
+    @Test
+    void shouldntGetCommentById() {
+        assertThatThrownBy(() -> commentService.getCommentById(23L))
+                .isInstanceOf(BAException.class)
+                .hasMessageStartingWith(Constants.COMMENT_NOT_FOUND);
     }
 }
