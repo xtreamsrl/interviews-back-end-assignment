@@ -5,6 +5,7 @@ import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.service.PostService;
+import it.ms.backendassignment.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private SearchService searchService;
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Post> createPost(@RequestBody PostDto postIn) throws BAException {
@@ -49,6 +53,14 @@ public class PostController {
     public ResponseEntity<Post> editPostById(@PathVariable Long id, @RequestBody PostDto newPost) throws BAException {
         Post post = postService.editPost(id, newPost);
         return ResponseEntity.ok(post);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, path = "/search")
+    public ResponseEntity<List<Post>> searchByKeyword(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                      @RequestParam(defaultValue = "5") Integer pageSize,
+                                                      @RequestParam String q) {
+        List<Post> posts = searchService.searchPostsByKeyword(pageNo, pageSize, q);
+        return ResponseEntity.ok(posts);
     }
 
 
