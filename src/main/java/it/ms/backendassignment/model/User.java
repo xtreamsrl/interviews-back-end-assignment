@@ -1,11 +1,13 @@
 package it.ms.backendassignment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -25,11 +27,15 @@ public class User {
 
     @Column(unique = true)
     @NonNull
-    private String name;
+    private String username;
 
     @Column(columnDefinition = "TEXT")
     @NonNull
+    @JsonIgnore
     private String password;
+
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
