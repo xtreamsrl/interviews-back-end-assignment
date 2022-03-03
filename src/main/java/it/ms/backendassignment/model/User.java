@@ -32,6 +32,7 @@ public class User {
     @Column(columnDefinition = "TEXT")
     @NonNull
     @JsonIgnore
+    @ToString.Exclude
     private String password;
 
     @Column(columnDefinition = "TIMESTAMP")

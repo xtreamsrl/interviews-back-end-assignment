@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,12 +43,15 @@ public class CommentTests {
 
     @Test
     @Transactional
-    void shouldAddCommentToPost() throws BAException {
+    void shouldAddCommentToPost() throws BAException, InterruptedException {
         PostDto postIn = new PostDto();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
 
         Post out = postService.createPost(postIn);
+
+        //Wait a bit so the update date is different from the creation one
+        TimeUnit.SECONDS.sleep(1);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
