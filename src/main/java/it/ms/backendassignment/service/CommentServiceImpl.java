@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment createComment(CommentDto commentIn) throws BAException {
+    public CommentDto createComment(CommentDto commentIn) throws BAException {
 
         if (Objects.isNull(commentIn.getPostId()) || StringUtils.isBlank(commentIn.getText())) {
             throw new BAException(Constants.BAD_COMMENT, HttpStatus.BAD_REQUEST);
@@ -53,7 +53,9 @@ public class CommentServiceImpl implements CommentService {
         postById.addComment(comment);
         postById.setUpdateDate(LocalDateTime.now());
 
-        Comment out = commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+
+        CommentDto out = new CommentDto(savedComment);
 
         log.info("Added comment {} to post {}", out, postById);
         return out;

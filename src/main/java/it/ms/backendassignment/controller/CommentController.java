@@ -21,8 +21,8 @@ public class CommentController {
     private CommentService commentService;
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Comment> createComment(@RequestBody CommentDto commentIn) throws BAException {
-        Comment comment = commentService.createComment(commentIn);
+    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentIn) throws BAException {
+        CommentDto comment = commentService.createComment(commentIn);
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 

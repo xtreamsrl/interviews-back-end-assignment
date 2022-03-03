@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userIn.getUsername());
         //very secure "encryption" :)
         user.setPassword(Base64.getEncoder().encodeToString(userIn.getPassword().getBytes()));
+        user.setCreationDate(LocalDateTime.now());
 
         User out = userRepository.save(user);
 

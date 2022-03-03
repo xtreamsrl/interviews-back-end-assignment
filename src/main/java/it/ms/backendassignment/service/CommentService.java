@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 public interface CommentService {
-    Comment createComment(CommentDto commentIn) throws BAException;
+    CommentDto createComment(CommentDto commentIn) throws BAException;
 
     List<Comment> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId);
 

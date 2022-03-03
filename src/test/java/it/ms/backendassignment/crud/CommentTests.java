@@ -4,9 +4,9 @@ import it.ms.backendassignment.constants.Constants;
 import it.ms.backendassignment.dto.CommentDto;
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
+import it.ms.backendassignment.dto.PostDtoIn;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Comment;
-import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.repository.CommentRepository;
 import it.ms.backendassignment.service.CommentService;
 import it.ms.backendassignment.service.PostService;
@@ -44,11 +44,11 @@ public class CommentTests {
     @Test
     @Transactional
     void shouldAddCommentToPost() throws BAException, InterruptedException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
 
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         //Wait a bit so the update date is different from the creation one
         TimeUnit.SECONDS.sleep(1);
@@ -59,7 +59,7 @@ public class CommentTests {
 
         commentService.createComment(commentIn);
 
-        Post postAfterComment = postService.getPostById(out.getId());
+        PostDto postAfterComment = postService.getPostDtoById(out.getId());
 
         assertThat(postAfterComment.getComments()).hasSize(1);
         assertThat(postAfterComment.getUpdateDate().isAfter(postAfterComment.getCreationDate())).isTrue();
@@ -68,11 +68,11 @@ public class CommentTests {
     @Test
     @Transactional
     void shouldGetCommentsFromPost() throws BAException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
 
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
@@ -85,7 +85,7 @@ public class CommentTests {
         commentService.createComment(commentIn);
         commentService.createComment(commentInTwo);
 
-        Post postAfterComment = postService.getPostById(out.getId());
+        PostDto postAfterComment = postService.getPostDtoById(out.getId());
 
         assertThat(postAfterComment.getComments()).hasSize(2);
 
@@ -96,16 +96,16 @@ public class CommentTests {
 
     @Test
     void shouldGetCommentById() throws BAException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         Comment commentById = commentService.getCommentById(comment.getId());
 
@@ -121,16 +121,16 @@ public class CommentTests {
 
     @Test
     void shouldDeleteComment() throws BAException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         DeleteDto deleteDto = commentService.deleteComment(comment.getId());
 
@@ -145,16 +145,16 @@ public class CommentTests {
 
     @Test
     void shouldUpdateComment() throws BAException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         CommentDto newComment = new CommentDto();
         newComment.setPostId(comment.getId());
@@ -168,16 +168,16 @@ public class CommentTests {
 
     @Test
     void shouldntUpdateComment() throws BAException {
-        PostDto postIn = new PostDto();
+        PostDtoIn postIn = new PostDtoIn();
         postIn.setTitle("A pretty title");
         postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
         CommentDto commentIn = new CommentDto();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         CommentDto newComment = new CommentDto();
 

@@ -1,14 +1,20 @@
 package it.ms.backendassignment.businesslogic;
 
 import it.ms.backendassignment.dto.PostDto;
+import it.ms.backendassignment.dto.PostDtoIn;
+import it.ms.backendassignment.dto.UserDto;
+import it.ms.backendassignment.dto.UserSignUpDto;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Post;
+import it.ms.backendassignment.model.User;
 import it.ms.backendassignment.repository.PostRepository;
+import it.ms.backendassignment.repository.UserRepository;
 import it.ms.backendassignment.service.PostService;
 import it.ms.backendassignment.service.SearchService;
+import it.ms.backendassignment.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -26,30 +32,53 @@ public class SearchTests {
     private PostService postService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void nukeDb() {
         postRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
+    UserDto createUser() throws BAException {
+        UserSignUpDto userInput = new UserSignUpDto();
+
+        userInput.setUsername("Carlo");
+        userInput.setPassword("1234");
+        userInput.setRepeatPassword("1234");
+
+        User user = userService.createUser(userInput);
+        UserDto out = new UserDto();
+        BeanUtils.copyProperties(user, out);
+
+        return out;
     }
 
     @Test
     void shouldFindPostsWithKeywordInTitle() throws BAException {
-        List<PostDto> postList = List.of(new PostDto("Title 1", "Body 1"),
-                new PostDto("Title 2", "Body 2"),
-                new PostDto("Title 3", "Body 3"),
-                new PostDto("Hello again", "World 4"),
-                new PostDto("Title 5", "Body 5"),
-                new PostDto("Title 6", "Body 6"),
-                new PostDto("Hello 7", "Hi"),
-                new PostDto("Hello", "World"));
+        UserDto user = createUser();
 
-        for (PostDto post : postList) {
+        List<PostDtoIn> postList = List.of(new PostDtoIn("Title 1", "Body 1", user.getUsername()),
+                new PostDtoIn("Title 2", "Body 2", user.getUsername()),
+                new PostDtoIn("Title 3", "Body 3", user.getUsername()),
+                new PostDtoIn("Hello again", "World 4", user.getUsername()),
+                new PostDtoIn("Title 5", "Body 5", user.getUsername()),
+                new PostDtoIn("Title 6", "Body 6", user.getUsername()),
+                new PostDtoIn("Hello 7", "Hi", user.getUsername()),
+                new PostDtoIn("Hello", "World", user.getUsername()));
+
+        for (PostDtoIn post : postList) {
             postService.createPost(post);
         }
 
         String keyword = "hello";
-        List<Post> posts = searchService.searchPostsByKeyword(0, 5, keyword);
+        List<PostDto> posts = searchService.searchPostsByKeyword(0, 5, keyword);
 
         assertThat(posts).hasSize(3);
         assertThat(posts.stream().filter(post -> StringUtils.containsIgnoreCase(post.getTitle(), keyword))).hasSize(3);
@@ -57,21 +86,23 @@ public class SearchTests {
 
     @Test
     void shouldFindPostsWithKeywordInBody() throws BAException {
-        List<PostDto> postList = List.of(new PostDto("Title 1", "Body 1"),
-                new PostDto("Title 2", "Body 2"),
-                new PostDto("Title 3", "Body 3"),
-                new PostDto("Hello again", "World 4"),
-                new PostDto("Title 5", "Body 5"),
-                new PostDto("Title 6", "Body 6"),
-                new PostDto("Hello 7", "Hi"),
-                new PostDto("Hello", "World"));
+        UserDto user = createUser();
 
-        for (PostDto post : postList) {
+        List<PostDtoIn> postList = List.of(new PostDtoIn("Title 1", "Body 1", user.getUsername()),
+                new PostDtoIn("Title 2", "Body 2", user.getUsername()),
+                new PostDtoIn("Title 3", "Body 3", user.getUsername()),
+                new PostDtoIn("Hello again", "World 4", user.getUsername()),
+                new PostDtoIn("Title 5", "Body 5", user.getUsername()),
+                new PostDtoIn("Title 6", "Body 6", user.getUsername()),
+                new PostDtoIn("Hello 7", "Hi", user.getUsername()),
+                new PostDtoIn("Hello", "World", user.getUsername()));
+
+        for (PostDtoIn post : postList) {
             postService.createPost(post);
         }
 
         String keyword = "hi";
-        List<Post> posts = searchService.searchPostsByKeyword(0, 5, keyword);
+        List<PostDto> posts = searchService.searchPostsByKeyword(0, 5, keyword);
 
         assertThat(posts).hasSize(1);
         assertThat(posts.stream().filter(post -> StringUtils.containsIgnoreCase(post.getBody(), keyword))).hasSize(1);
@@ -79,19 +110,20 @@ public class SearchTests {
 
     @Test
     void shouldFindPostsWithKeywordInTitleAndBody() throws BAException {
-        List<PostDto> postList = List.of(
-                new PostDto("Hello", "Body"),
-                new PostDto("Word", "Hello"),
-                new PostDto("Algorithms", "Data"),
-                new PostDto("Another title", "Another body")
+        UserDto user = createUser();
+        List<PostDtoIn> postList = List.of(
+                new PostDtoIn("Hello", "Body", user.getUsername()),
+                new PostDtoIn("Word", "Hello", user.getUsername()),
+                new PostDtoIn("Algorithms", "Data", user.getUsername()),
+                new PostDtoIn("Another title", "Another body", user.getUsername())
         );
 
-        for (PostDto post : postList) {
+        for (PostDtoIn post : postList) {
             postService.createPost(post);
         }
 
         String keyword = "hello";
-        List<Post> posts = searchService.searchPostsByKeyword(0, 5, keyword);
+        List<PostDto> posts = searchService.searchPostsByKeyword(0, 5, keyword);
 
         assertThat(posts).hasSize(2);
         assertThat(posts.stream().filter(post -> StringUtils.containsIgnoreCase(post.getTitle(), keyword) ||
@@ -100,21 +132,23 @@ public class SearchTests {
 
     @Test
     void shouldReturnEmptyListWhenNoMatches() throws BAException {
-        List<PostDto> postList = List.of(new PostDto("Title 1", "Body 1"),
-                new PostDto("Title 2", "Body 2"),
-                new PostDto("Title 3", "Body 3"),
-                new PostDto("Hello again", "World 4"),
-                new PostDto("Title 5", "Body 5"),
-                new PostDto("Title 6", "Body 6"),
-                new PostDto("Hello 7", "Hi"),
-                new PostDto("Hello", "World"));
+        UserDto user = createUser();
 
-        for (PostDto post : postList) {
+        List<PostDtoIn> postList = List.of(new PostDtoIn("Title 1", "Body 1", user.getUsername()),
+                new PostDtoIn("Title 2", "Body 2", user.getUsername()),
+                new PostDtoIn("Title 3", "Body 3", user.getUsername()),
+                new PostDtoIn("Hello again", "World 4", user.getUsername()),
+                new PostDtoIn("Title 5", "Body 5", user.getUsername()),
+                new PostDtoIn("Title 6", "Body 6", user.getUsername()),
+                new PostDtoIn("Hello 7", "Hi", user.getUsername()),
+                new PostDtoIn("Hello", "World", user.getUsername()));
+
+        for (PostDtoIn post : postList) {
             postService.createPost(post);
         }
 
         String keyword = "ciao";
-        List<Post> posts = searchService.searchPostsByKeyword(0, 5, keyword);
+        List<PostDto> posts = searchService.searchPostsByKeyword(0, 5, keyword);
 
         assertThat(posts).isEmpty();
     }
