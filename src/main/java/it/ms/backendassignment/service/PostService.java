@@ -1,10 +1,10 @@
 package it.ms.backendassignment.service;
 
+import it.ms.backendassignment.domain.Post;
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
 import it.ms.backendassignment.dto.PostDtoIn;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Post;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

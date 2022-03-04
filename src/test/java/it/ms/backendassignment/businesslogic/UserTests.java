@@ -1,11 +1,11 @@
 package it.ms.backendassignment.businesslogic;
 
 import it.ms.backendassignment.constants.Constants;
+import it.ms.backendassignment.domain.User;
 import it.ms.backendassignment.dto.LoginResponseDto;
 import it.ms.backendassignment.dto.UserDto;
 import it.ms.backendassignment.dto.UserSignUpDto;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.User;
 import it.ms.backendassignment.repository.UserRepository;
 import it.ms.backendassignment.service.UserService;
 import org.junit.jupiter.api.BeforeEach;

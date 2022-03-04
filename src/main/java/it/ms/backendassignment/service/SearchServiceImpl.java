@@ -1,7 +1,7 @@
 package it.ms.backendassignment.service;
 
+import it.ms.backendassignment.domain.Post;
 import it.ms.backendassignment.dto.PostDto;
-import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.repository.PostRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

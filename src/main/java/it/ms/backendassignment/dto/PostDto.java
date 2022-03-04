@@ -1,8 +1,8 @@
 package it.ms.backendassignment.dto;
 
+import it.ms.backendassignment.domain.Comment;
+import it.ms.backendassignment.domain.Post;
 import it.ms.backendassignment.model.AuthorDetails;
-import it.ms.backendassignment.model.Comment;
-import it.ms.backendassignment.model.Post;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;

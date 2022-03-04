@@ -1,6 +1,6 @@
 package it.ms.backendassignment.repository;
 
-import it.ms.backendassignment.model.User;
+import it.ms.backendassignment.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

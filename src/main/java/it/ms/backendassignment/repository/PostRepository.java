@@ -1,6 +1,6 @@
 package it.ms.backendassignment.repository;
 
-import it.ms.backendassignment.model.Post;
+import it.ms.backendassignment.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

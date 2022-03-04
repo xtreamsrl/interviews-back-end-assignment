@@ -1,13 +1,13 @@
 package it.ms.backendassignment.service;
 
 import it.ms.backendassignment.constants.Constants;
+import it.ms.backendassignment.domain.Comment;
+import it.ms.backendassignment.domain.Post;
+import it.ms.backendassignment.domain.User;
 import it.ms.backendassignment.dto.CommentDto;
 import it.ms.backendassignment.dto.CommentDtoIn;
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Comment;
-import it.ms.backendassignment.model.Post;
-import it.ms.backendassignment.model.User;
 import it.ms.backendassignment.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

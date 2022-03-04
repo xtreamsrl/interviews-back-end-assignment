@@ -1,4 +1,4 @@
-package it.ms.backendassignment.model;
+package it.ms.backendassignment.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;

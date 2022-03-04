@@ -1,10 +1,10 @@
 package it.ms.backendassignment.crud;
 
 import it.ms.backendassignment.constants.Constants;
+import it.ms.backendassignment.domain.Post;
+import it.ms.backendassignment.domain.User;
 import it.ms.backendassignment.dto.*;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Post;
-import it.ms.backendassignment.model.User;
 import it.ms.backendassignment.repository.PostRepository;
 import it.ms.backendassignment.repository.UserRepository;
 import it.ms.backendassignment.service.PostService;
