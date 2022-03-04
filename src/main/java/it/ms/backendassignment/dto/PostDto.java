@@ -31,14 +31,16 @@ public class PostDto {
 
         for (Comment comment : Optional.of(post).map(Post::getComments).orElse(new HashSet<>())) {
             CommentDto dto = new CommentDto();
+            BeanUtils.copyProperties(comment, dto);
             dto.setPostId(comment.getPost().getId());
-            dto.setText(comment.getText());
 
             AuthorDetails authorDetails = new AuthorDetails();
             authorDetails.setUsername(comment.getUser().getUsername());
             authorDetails.setUserId(comment.getUser().getId());
 
             dto.setAuthorDetails(authorDetails);
+
+            this.comments.add(dto);
         }
 
     }

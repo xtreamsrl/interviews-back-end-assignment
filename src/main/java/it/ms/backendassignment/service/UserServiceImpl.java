@@ -67,4 +67,9 @@ public class UserServiceImpl implements UserService {
             throw new BAException(Constants.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @Override
+    public User findUserByName(String username) throws BAException {
+        return userRepository.findByUsername(username).orElseThrow(() -> new BAException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
 }

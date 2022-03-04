@@ -1,6 +1,7 @@
 package it.ms.backendassignment.service;
 
 import it.ms.backendassignment.dto.CommentDto;
+import it.ms.backendassignment.dto.CommentDtoIn;
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.exception.BAException;
 import it.ms.backendassignment.model.Comment;
@@ -10,13 +11,15 @@ import java.util.List;
 
 @Component
 public interface CommentService {
-    CommentDto createComment(CommentDto commentIn) throws BAException;
+    CommentDto createComment(CommentDtoIn commentIn) throws BAException;
 
-    List<Comment> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId);
+    List<CommentDto> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId);
 
     Comment getCommentById(Long commentId) throws BAException;
 
+    CommentDto getCommentDtoById(Long commentId) throws BAException;
+
     DeleteDto deleteComment(Long commentId);
 
-    Comment editComment(Long commentId, CommentDto newComment) throws BAException;
+    CommentDto editComment(Long commentId, CommentDtoIn newComment) throws BAException;
 }

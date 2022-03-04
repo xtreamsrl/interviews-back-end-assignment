@@ -12,4 +12,6 @@ public interface UserService {
     User createUser(UserSignUpDto userIn) throws BAException;
 
     LoginResponseDto loginUser(UserDto userIn) throws BAException;
+
+    User findUserByName(String username) throws BAException;
 }

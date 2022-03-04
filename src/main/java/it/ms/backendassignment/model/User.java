@@ -66,7 +66,7 @@ public class User {
     public void addComment(Comment comment) {
         comment.setUser(this);
 
-        if (Objects.isNull(this.posts)) {
+        if (Objects.isNull(this.comments)) {
             this.comments = new HashSet<>();
         }
 
