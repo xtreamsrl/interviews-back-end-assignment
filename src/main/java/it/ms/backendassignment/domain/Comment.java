@@ -1,4 +1,4 @@
-package it.ms.backendassignment.model;
+package it.ms.backendassignment.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
@@ -38,6 +38,11 @@ public class Comment {
     @NonNull
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime updateDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 
     @Override
     public boolean equals(Object o) {

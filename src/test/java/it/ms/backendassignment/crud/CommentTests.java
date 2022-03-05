@@ -1,22 +1,25 @@
 package it.ms.backendassignment.crud;
 
 import it.ms.backendassignment.constants.Constants;
-import it.ms.backendassignment.dto.CommentDto;
-import it.ms.backendassignment.dto.DeleteDto;
-import it.ms.backendassignment.dto.PostDto;
+import it.ms.backendassignment.domain.Comment;
+import it.ms.backendassignment.domain.User;
+import it.ms.backendassignment.dto.*;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Comment;
-import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.repository.CommentRepository;
+import it.ms.backendassignment.repository.PostRepository;
+import it.ms.backendassignment.repository.UserRepository;
 import it.ms.backendassignment.service.CommentService;
 import it.ms.backendassignment.service.PostService;
+import it.ms.backendassignment.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,76 +35,102 @@ public class CommentTests {
     private CommentService commentService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @BeforeEach
     void nukeDb() {
         commentRepository.deleteAll();
+        postRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
+     UserDto createUser() throws BAException {
+        UserSignUpDto userInput = new UserSignUpDto();
+
+        userInput.setUsername("Carlo");
+        userInput.setPassword("1234");
+        userInput.setRepeatPassword("1234");
+
+        User user = userService.createUser(userInput);
+        UserDto out = new UserDto();
+        BeanUtils.copyProperties(user, out);
+
+        return out;
+    }
     @Test
-    @Transactional
-    void shouldAddCommentToPost() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
+    void shouldAddCommentToPost() throws BAException, InterruptedException {
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
-        CommentDto commentIn = new CommentDto();
+        //Wait a bit so the update date is different from the creation one
+        TimeUnit.SECONDS.sleep(1);
+
+        CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
+        commentIn.setUsername(user.getUsername());
 
         commentService.createComment(commentIn);
 
-        Post postAfterComment = postService.getPostById(out.getId());
+        PostDto postAfterComment = postService.getPostDtoById(out.getId());
 
         assertThat(postAfterComment.getComments()).hasSize(1);
         assertThat(postAfterComment.getUpdateDate().isAfter(postAfterComment.getCreationDate())).isTrue();
     }
 
     @Test
-    @Transactional
     void shouldGetCommentsFromPost() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        Post out = postService.createPost(postIn);
+        PostDto out = postService.createPost(postIn);
 
-        CommentDto commentIn = new CommentDto();
+        CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
+        commentIn.setUsername(user.getUsername());
 
-        CommentDto commentInTwo = new CommentDto();
+        CommentDtoIn commentInTwo = new CommentDtoIn();
         commentInTwo.setPostId(out.getId());
         commentInTwo.setText("This is another comment");
+        commentInTwo.setUsername(user.getUsername());
 
         commentService.createComment(commentIn);
         commentService.createComment(commentInTwo);
 
-        Post postAfterComment = postService.getPostById(out.getId());
+        PostDto postAfterComment = postService.getPostDtoById(out.getId());
 
         assertThat(postAfterComment.getComments()).hasSize(2);
 
-        List<Comment> firstCommentPage = commentService.getCommentsFromPost(0, 1, out.getId());
+        List<CommentDto> firstCommentPage = commentService.getCommentsFromPost(0, 1, out.getId());
 
         assertThat(firstCommentPage).hasSize(1);
     }
 
     @Test
     void shouldGetCommentById() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        CommentDto commentIn = new CommentDto();
+        PostDto out = postService.createPost(postIn);
+
+        CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
+        commentIn.setUsername(user.getUsername());
         commentIn.setText("This is a comment");
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         Comment commentById = commentService.getCommentById(comment.getId());
 
@@ -116,47 +145,55 @@ public class CommentTests {
     }
 
     @Test
+    @Transactional
     void shouldDeleteComment() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        CommentDto commentIn = new CommentDto();
-        commentIn.setPostId(out.getId());
+        PostDto savedPost = postService.createPost(postIn);
+
+        User author = userService.findUserByName(user.getUsername());
+
+        CommentDtoIn commentIn = new CommentDtoIn();
+        commentIn.setPostId(savedPost.getId());
         commentIn.setText("This is a comment");
+        commentIn.setUsername(user.getUsername());
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
         DeleteDto deleteDto = commentService.deleteComment(comment.getId());
 
         assertThat(deleteDto.getSuccess()).isTrue();
+        assertThat(savedPost.getComments()).isEmpty();
+        assertThat(author.getComments()).isEmpty();
     }
 
     @Test
-    void shouldntDeletePost() {
+    void shouldntDeletePost() throws BAException {
         DeleteDto deleteDto = commentService.deleteComment(2L);
         assertThat(deleteDto.getSuccess()).isFalse();
     }
 
     @Test
     void shouldUpdateComment() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        CommentDto commentIn = new CommentDto();
+        PostDto out = postService.createPost(postIn);
+
+        CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
+        commentIn.setUsername(user.getUsername());
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
-        CommentDto newComment = new CommentDto();
+        CommentDtoIn newComment = new CommentDtoIn();
         newComment.setPostId(comment.getId());
         newComment.setText("Edited text");
 
-        Comment editedComment = commentService.editComment(comment.getId(), newComment);
+
+        CommentDto editedComment = commentService.editComment(comment.getId(), newComment);
 
         assertThat(editedComment.getText()).isEqualTo(newComment.getText());
         assertThat(editedComment.getUpdateDate().isAfter(out.getUpdateDate())).isTrue();
@@ -164,20 +201,20 @@ public class CommentTests {
 
     @Test
     void shouldntUpdateComment() throws BAException {
-        PostDto postIn = new PostDto();
-        postIn.setTitle("A pretty title");
-        postIn.setBody("A pretty body");
-        Post out = postService.createPost(postIn);
+        UserDto user = createUser();
+        PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
+        PostDto out = postService.createPost(postIn);
 
-        CommentDto commentIn = new CommentDto();
+        CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
         commentIn.setText("This is a comment");
+        commentIn.setUsername(user.getUsername());
 
-        Comment comment = commentService.createComment(commentIn);
+        CommentDto comment = commentService.createComment(commentIn);
 
-        CommentDto newComment = new CommentDto();
+        CommentDtoIn newComment = new CommentDtoIn();
 
-        Comment editedComment = commentService.editComment(comment.getId(), newComment);
+        CommentDto editedComment = commentService.editComment(comment.getId(), newComment);
         assertThat(editedComment.getText()).isEqualTo(comment.getText());
     }
 }

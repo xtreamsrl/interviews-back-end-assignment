@@ -1,11 +1,13 @@
 package it.ms.backendassignment.service;
 
 import it.ms.backendassignment.constants.Constants;
+import it.ms.backendassignment.domain.Comment;
+import it.ms.backendassignment.domain.Post;
+import it.ms.backendassignment.domain.User;
 import it.ms.backendassignment.dto.CommentDto;
+import it.ms.backendassignment.dto.CommentDtoIn;
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Comment;
-import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.repository.CommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -32,40 +35,59 @@ public class CommentServiceImpl implements CommentService {
     private PostService postService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CommentRepository commentRepository;
 
     @Override
     @Transactional
-    public Comment createComment(CommentDto commentIn) throws BAException {
+    public CommentDto createComment(CommentDtoIn commentIn) throws BAException {
 
         if (Objects.isNull(commentIn.getPostId()) || StringUtils.isBlank(commentIn.getText())) {
             throw new BAException(Constants.BAD_COMMENT, HttpStatus.BAD_REQUEST);
+        } else if (StringUtils.isBlank(commentIn.getUsername())) {
+            throw new BAException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
         Post postById = postService.getPostById(commentIn.getPostId());
+        User user = userService.findUserByName(commentIn.getUsername());
 
         Comment comment = new Comment();
 
         BeanUtils.copyProperties(commentIn, comment);
         comment.setCreationDate(LocalDateTime.now());
         comment.setUpdateDate(LocalDateTime.now());
+        comment.setPost(postById);
+        comment.setUser(user);
 
-        postById.addComment(comment);
+        Comment savedComment = commentRepository.save(comment);
+
+        postById.addComment(savedComment);
+        user.addComment(savedComment);
         postById.setUpdateDate(LocalDateTime.now());
 
-        Comment out = commentRepository.save(comment);
+        CommentDto out = new CommentDto(savedComment);
 
         log.info("Added comment {} to post {}", out, postById);
         return out;
     }
 
     @Override
-    public List<Comment> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId) {
+    public List<CommentDto> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId) {
         Pageable pagination = PageRequest.of(pageNo, pageSize, Sort.by("updateDate").descending());
 
-        Page<Comment> pagedResult = commentRepository.findByPostId(pagination, postId);
+        Page<Comment> comments = commentRepository.findByPostId(postId, pagination);
 
-        return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
+        List<CommentDto> out = new ArrayList<>();
+        if (comments.hasContent()){
+            out = comments.getContent()
+                    .stream()
+                    .map(CommentDto::new)
+                    .collect(Collectors.toList());
+        }
+
+        return out;
     }
 
     @Override
@@ -75,10 +97,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public DeleteDto deleteComment(Long commentId) {
+    public CommentDto getCommentDtoById(Long commentId) throws BAException {
+        return commentRepository.findById(commentId).map(CommentDto::new)
+                .orElseThrow(() -> new BAException(Constants.COMMENT_NOT_FOUND + " id: " + commentId, HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public DeleteDto deleteComment(Long commentId) throws BAException {
         DeleteDto deleteDto = new DeleteDto();
 
         if (commentRepository.findById(commentId).isPresent()) {
+            Comment comment = this.getCommentById(commentId);
+            User user = userService.findUserByName(comment.getUser().getUsername());
+            user.removeComment(comment);
+
             commentRepository.deleteById(commentId);
 
             deleteDto.setMessage("Deleted comment with id: " + commentId);
@@ -92,7 +124,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment editComment(Long commentId, CommentDto newComment) throws BAException {
+    public CommentDto editComment(Long commentId, CommentDtoIn newComment) throws BAException {
         Comment oldComment = this.getCommentById(commentId);
 
         if (StringUtils.isNotBlank(newComment.getText())) {
@@ -102,6 +134,6 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(oldComment);
         }
 
-        return oldComment;
+        return new CommentDto(oldComment);
     }
 }

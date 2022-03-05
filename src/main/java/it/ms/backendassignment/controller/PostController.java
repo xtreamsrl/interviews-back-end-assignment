@@ -2,8 +2,8 @@ package it.ms.backendassignment.controller;
 
 import it.ms.backendassignment.dto.DeleteDto;
 import it.ms.backendassignment.dto.PostDto;
+import it.ms.backendassignment.dto.PostDtoIn;
 import it.ms.backendassignment.exception.BAException;
-import it.ms.backendassignment.model.Post;
 import it.ms.backendassignment.service.PostService;
 import it.ms.backendassignment.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,41 +25,41 @@ public class PostController {
     private SearchService searchService;
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Post> createPost(@RequestBody PostDto postIn) throws BAException {
-        Post post = postService.createPost(postIn);
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDtoIn postIn) throws BAException {
+        PostDto post = postService.createPost(postIn);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) throws BAException {
-        Post post = postService.getPostById(id);
+    public ResponseEntity<PostDto> getPostById(@PathVariable Long id) throws BAException {
+        PostDto post = postService.getPostDtoById(id);
         return ResponseEntity.ok().body(post);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Post>> getPosts(@RequestParam(defaultValue = "0") Integer pageNo,
-                                               @RequestParam(defaultValue = "5") Integer pageSize) {
-        List<Post> posts = postService.getPosts(pageNo, pageSize);
+    public ResponseEntity<List<PostDto>> getPosts(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                  @RequestParam(defaultValue = "5") Integer pageSize) {
+        List<PostDto> posts = postService.getPosts(pageNo, pageSize);
         return ResponseEntity.ok(posts);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<DeleteDto> deletePostById(@PathVariable Long id) {
+    public ResponseEntity<DeleteDto> deletePostById(@PathVariable Long id) throws BAException {
         DeleteDto deleteDto = postService.deletePost(id);
         return ResponseEntity.ok(deleteDto);
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<Post> editPostById(@PathVariable Long id, @RequestBody PostDto newPost) throws BAException {
-        Post post = postService.editPost(id, newPost);
+    public ResponseEntity<PostDto> editPostById(@PathVariable Long id, @RequestBody PostDtoIn newPost) throws BAException {
+        PostDto post = postService.editPost(id, newPost);
         return ResponseEntity.ok(post);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, path = "/search")
-    public ResponseEntity<List<Post>> searchByKeyword(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                      @RequestParam(defaultValue = "5") Integer pageSize,
-                                                      @RequestParam String q) {
-        List<Post> posts = searchService.searchPostsByKeyword(pageNo, pageSize, q);
+    public ResponseEntity<List<PostDto>> searchByKeyword(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                         @RequestParam(defaultValue = "5") Integer pageSize,
+                                                         @RequestParam String q) {
+        List<PostDto> posts = searchService.searchPostsByKeyword(pageNo, pageSize, q);
         return ResponseEntity.ok(posts);
     }
 
