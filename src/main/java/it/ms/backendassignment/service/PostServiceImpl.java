@@ -36,6 +36,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Transactional
     @Override
     public PostDto createPost(PostDtoIn postDtoIn) throws BAException {
@@ -66,11 +69,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public PostDto getPostDtoById(Long postId) throws BAException {
         return postRepository.findById(postId).map(PostDto::new).orElseThrow(() -> new BAException(Constants.POST_NOT_FOUND + " id: " + postId, HttpStatus.NOT_FOUND));
     }
 
     @Override
+    @Transactional
     public Post getPostById(Long postId) throws BAException {
         return postRepository.findById(postId).orElseThrow(() -> new BAException(Constants.POST_NOT_FOUND + " id: " + postId, HttpStatus.NOT_FOUND));
     }
@@ -95,12 +100,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public DeleteDto deletePost(Long postId) {
+    public DeleteDto deletePost(Long postId) throws BAException {
         DeleteDto deleteDto = new DeleteDto();
 
         if (postRepository.findById(postId).isPresent()) {
-            Post post = postRepository.findById(postId).get();
-            User user = userRepository.findByUsername(post.getUser().getUsername()).get();
+            Post post = this.getPostById(postId);
+            User user = userService.findUserByName(post.getUser().getUsername());
 
             user.removePost(post);
             postRepository.deleteById(postId);

@@ -19,7 +19,7 @@ public interface CommentService {
 
     CommentDto getCommentDtoById(Long commentId) throws BAException;
 
-    DeleteDto deleteComment(Long commentId);
+    DeleteDto deleteComment(Long commentId) throws BAException;
 
     CommentDto editComment(Long commentId, CommentDtoIn newComment) throws BAException;
 }

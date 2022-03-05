@@ -67,7 +67,6 @@ public class CommentTests {
         return out;
     }
     @Test
-    @Transactional
     void shouldAddCommentToPost() throws BAException, InterruptedException {
         UserDto user = createUser();
         PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
@@ -91,7 +90,6 @@ public class CommentTests {
     }
 
     @Test
-    @Transactional
     void shouldGetCommentsFromPost() throws BAException {
         UserDto user = createUser();
         PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
@@ -147,14 +145,17 @@ public class CommentTests {
     }
 
     @Test
+    @Transactional
     void shouldDeleteComment() throws BAException {
         UserDto user = createUser();
         PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
-        PostDto out = postService.createPost(postIn);
+        PostDto savedPost = postService.createPost(postIn);
+
+        User author = userService.findUserByName(user.getUsername());
 
         CommentDtoIn commentIn = new CommentDtoIn();
-        commentIn.setPostId(out.getId());
+        commentIn.setPostId(savedPost.getId());
         commentIn.setText("This is a comment");
         commentIn.setUsername(user.getUsername());
 
@@ -163,10 +164,12 @@ public class CommentTests {
         DeleteDto deleteDto = commentService.deleteComment(comment.getId());
 
         assertThat(deleteDto.getSuccess()).isTrue();
+        assertThat(savedPost.getComments()).isEmpty();
+        assertThat(author.getComments()).isEmpty();
     }
 
     @Test
-    void shouldntDeletePost() {
+    void shouldntDeletePost() throws BAException {
         DeleteDto deleteDto = commentService.deleteComment(2L);
         assertThat(deleteDto.getSuccess()).isFalse();
     }

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
+    @Transactional
     public User createUser(UserSignUpDto userIn) throws BAException {
         if (userRepository.findByUsername(userIn.getUsername()).isPresent()) {
             throw new BAException(Constants.USERNAME_ALREADY_PRESENT, HttpStatus.BAD_REQUEST);
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public LoginResponseDto loginUser(UserDto userIn) throws BAException {
         if (StringUtils.isBlank(userIn.getUsername()) || StringUtils.isBlank(userIn.getPassword())) {
             throw new BAException(Constants.BAD_USER_LOGIN_INPUT, HttpStatus.BAD_REQUEST);

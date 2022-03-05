@@ -44,7 +44,7 @@ public class PostController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<DeleteDto> deletePostById(@PathVariable Long id) {
+    public ResponseEntity<DeleteDto> deletePostById(@PathVariable Long id) throws BAException {
         DeleteDto deleteDto = postService.deletePost(id);
         return ResponseEntity.ok(deleteDto);
     }
@@ -57,8 +57,8 @@ public class PostController {
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, path = "/search")
     public ResponseEntity<List<PostDto>> searchByKeyword(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                      @RequestParam(defaultValue = "5") Integer pageSize,
-                                                      @RequestParam String q) {
+                                                         @RequestParam(defaultValue = "5") Integer pageSize,
+                                                         @RequestParam String q) {
         List<PostDto> posts = searchService.searchPostsByKeyword(pageNo, pageSize, q);
         return ResponseEntity.ok(posts);
     }

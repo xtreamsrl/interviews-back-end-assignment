@@ -1,13 +1,12 @@
 package it.ms.backendassignment.businesslogic;
 
 import it.ms.backendassignment.domain.User;
-import it.ms.backendassignment.dto.PostDto;
-import it.ms.backendassignment.dto.PostDtoIn;
-import it.ms.backendassignment.dto.UserDto;
-import it.ms.backendassignment.dto.UserSignUpDto;
+import it.ms.backendassignment.dto.*;
 import it.ms.backendassignment.exception.BAException;
+import it.ms.backendassignment.repository.CommentRepository;
 import it.ms.backendassignment.repository.PostRepository;
 import it.ms.backendassignment.repository.UserRepository;
+import it.ms.backendassignment.service.CommentService;
 import it.ms.backendassignment.service.PostService;
 import it.ms.backendassignment.service.SearchService;
 import it.ms.backendassignment.service.UserService;
@@ -18,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,13 +35,20 @@ public class SearchTests {
     private UserService userService;
 
     @Autowired
+    private CommentService commentService;
+
+    @Autowired
     private PostRepository postRepository;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
     @BeforeEach
     void nukeDb() {
+        commentRepository.deleteAll();
         postRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -151,6 +158,134 @@ public class SearchTests {
         List<PostDto> posts = searchService.searchPostsByKeyword(0, 5, keyword);
 
         assertThat(posts).isEmpty();
+    }
+
+    @Test
+    void shouldFindPostsByUsername() throws BAException {
+        //create three users
+        UserDto carlo = createUser();
+
+        UserSignUpDto marioDto = new UserSignUpDto();
+
+        marioDto.setUsername("Mario");
+        marioDto.setPassword("1234");
+        marioDto.setRepeatPassword("1234");
+
+        User marioOut = userService.createUser(marioDto);
+        UserDto mario = new UserDto();
+        BeanUtils.copyProperties(marioOut, mario);
+
+        UserSignUpDto francoDto = new UserSignUpDto();
+
+        francoDto.setUsername("Franco");
+        francoDto.setPassword("1234");
+        francoDto.setRepeatPassword("1234");
+
+        User francoOut = userService.createUser(francoDto);
+        UserDto franco = new UserDto();
+        BeanUtils.copyProperties(francoOut, franco);
+
+        //make two of them post
+        List<PostDtoIn> postList = List.of(new PostDtoIn("Carlo's post #1", "A pretty body", carlo.getUsername()),
+                new PostDtoIn("Mario's post #1", "Another pretty body", mario.getUsername()),
+                new PostDtoIn("Carlo's post #2", "I don't know", carlo.getUsername()),
+                new PostDtoIn("Mario's post #2", "What to write in these", mario.getUsername())
+        );
+
+        for (PostDtoIn post : postList) {
+            postService.createPost(post);
+        }
+
+        //search Mario's posts
+        List<PostDto> mariosPosts = searchService.searchPostsByUser(0, 5, mario.getUsername());
+        //search Carlo's posts
+        List<PostDto> carlosPosts = searchService.searchPostsByUser(0, 5, carlo.getUsername());
+        //search Franco's posts
+        List<PostDto> francosPosts = searchService.searchPostsByUser(0, 5, franco.getUsername());
+
+        //assertions
+        assertThat(mariosPosts).hasSize(2);
+        mariosPosts.forEach(post -> assertThat(post.getAuthorDetails().getUsername()).isEqualTo(mario.getUsername()));
+
+        assertThat(carlosPosts).hasSize(2);
+        carlosPosts.forEach(post -> assertThat(post.getAuthorDetails().getUsername()).isEqualTo(carlo.getUsername()));
+
+        assertThat(francosPosts).isEmpty();
+    }
+
+    @Test
+    void shouldFindCommentsByUsername() throws BAException {
+        //create three users
+        UserDto carlo = createUser();
+
+        UserSignUpDto marioDto = new UserSignUpDto();
+
+        marioDto.setUsername("Mario");
+        marioDto.setPassword("1234");
+        marioDto.setRepeatPassword("1234");
+
+        User marioOut = userService.createUser(marioDto);
+        UserDto mario = new UserDto();
+        BeanUtils.copyProperties(marioOut, mario);
+
+        UserSignUpDto francoDto = new UserSignUpDto();
+
+        francoDto.setUsername("Franco");
+        francoDto.setPassword("1234");
+        francoDto.setRepeatPassword("1234");
+
+        User francoOut = userService.createUser(francoDto);
+        UserDto franco = new UserDto();
+        BeanUtils.copyProperties(francoOut, franco);
+
+        //make two of them post
+        List<PostDtoIn> postList = List.of(new PostDtoIn("Carlo's post #1", "A pretty body", carlo.getUsername()),
+                new PostDtoIn("Mario's post #1", "Another pretty body", mario.getUsername()),
+                new PostDtoIn("Carlo's post #2", "I don't know", carlo.getUsername()),
+                new PostDtoIn("Mario's post #2", "What to write in these", mario.getUsername())
+        );
+
+        List<PostDto> savedPosts = new ArrayList<>();
+
+        for (PostDtoIn post : postList) {
+            savedPosts.add(postService.createPost(post));
+        }
+
+        //add comments
+        for (int i = 0; i < savedPosts.size(); i++) {
+            PostDto post = savedPosts.get(i);
+
+            CommentDtoIn commentIn = new CommentDtoIn();
+            commentIn.setPostId(post.getId());
+
+            String username;
+
+            if ((i % 2) == 0) {
+                username = mario.getUsername();
+            } else {
+                username = carlo.getUsername();
+            }
+            commentIn.setText("This is a comment from" + username);
+            commentIn.setUsername(username);
+
+            commentService.createComment(commentIn);
+        }
+
+        //search Carlo's comments
+        List<CommentDto> carlosComments = searchService.searchCommentsByUser(0, 5, carlo.getUsername());
+        //search Mario's comments
+        List<CommentDto> mariosComments = searchService.searchCommentsByUser(0, 5, mario.getUsername());
+        //search Franco's comments
+        List<CommentDto> francoComments = searchService.searchCommentsByUser(0, 5, franco.getUsername());
+
+        //assertions
+        assertThat(carlosComments).hasSize(2);
+        carlosComments.forEach(comment -> assertThat(comment.getAuthorDetails().getUsername()).isEqualTo(carlo.getUsername()));
+
+        assertThat(mariosComments).hasSize(2);
+        mariosComments.forEach(comment -> assertThat(comment.getAuthorDetails().getUsername()).isEqualTo(mario.getUsername()));
+
+        assertThat(francoComments).isEmpty();
     }
 
 }

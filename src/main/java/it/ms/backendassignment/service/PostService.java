@@ -19,7 +19,7 @@ public interface PostService {
 
     List<PostDto> getPosts(Integer pageNo, Integer pageSize);
 
-    DeleteDto deletePost(Long postId);
+    DeleteDto deletePost(Long postId) throws BAException;
 
     PostDto editPost(Long postId, PostDtoIn newPost) throws BAException;
 }

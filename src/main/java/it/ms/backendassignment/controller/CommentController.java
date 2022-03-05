@@ -41,7 +41,7 @@ public class CommentController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
-    public ResponseEntity<DeleteDto> deleteCommentById(@PathVariable Long id) {
+    public ResponseEntity<DeleteDto> deleteCommentById(@PathVariable Long id) throws BAException {
         DeleteDto deleteDto = commentService.deleteComment(id);
         return ResponseEntity.ok(deleteDto);
     }

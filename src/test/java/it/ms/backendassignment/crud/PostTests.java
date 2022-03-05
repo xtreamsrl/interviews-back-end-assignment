@@ -155,14 +155,14 @@ public class PostTests {
         DeleteDto deleteDto = postService.deletePost(out.getId());
 
         String username = out.getAuthorDetails().getUsername();
-        User author = userRepository.findByUsername(username).get();
+        User author = userService.findUserByName(username);
 
         assertThat(author.getPosts()).isEmpty();
         assertThat(deleteDto.getSuccess()).isTrue();
     }
 
     @Test
-    void shouldntDeletePost() {
+    void shouldntDeletePost() throws BAException {
         DeleteDto deleteDto = postService.deletePost(2L);
         assertThat(deleteDto.getSuccess()).isFalse();
     }

@@ -77,7 +77,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDto> getCommentsFromPost(Integer pageNo, Integer pageSize, Long postId) {
         Pageable pagination = PageRequest.of(pageNo, pageSize, Sort.by("updateDate").descending());
 
-        Page<Comment> comments = commentRepository.findByPostId(pagination, postId);
+        Page<Comment> comments = commentRepository.findByPostId(postId, pagination);
 
         List<CommentDto> out = new ArrayList<>();
         if (comments.hasContent()){
@@ -103,10 +103,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public DeleteDto deleteComment(Long commentId) {
+    public DeleteDto deleteComment(Long commentId) throws BAException {
         DeleteDto deleteDto = new DeleteDto();
 
         if (commentRepository.findById(commentId).isPresent()) {
+            Comment comment = this.getCommentById(commentId);
+            User user = userService.findUserByName(comment.getUser().getUsername());
+            user.removeComment(comment);
+
             commentRepository.deleteById(commentId);
 
             deleteDto.setMessage("Deleted comment with id: " + commentId);
