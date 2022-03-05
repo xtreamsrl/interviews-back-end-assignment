@@ -6,6 +6,8 @@ import it.ms.backendassignment.dto.LoginResponseDto;
 import it.ms.backendassignment.dto.UserDto;
 import it.ms.backendassignment.dto.UserSignUpDto;
 import it.ms.backendassignment.exception.BAException;
+import it.ms.backendassignment.repository.CommentRepository;
+import it.ms.backendassignment.repository.PostRepository;
 import it.ms.backendassignment.repository.UserRepository;
 import it.ms.backendassignment.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +21,22 @@ import static org.assertj.core.api.Assertions.*;
 public class UserTests {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
+    private CommentRepository commentRepository;
+
 
     @BeforeEach
     void nukeDb() {
+        commentRepository.deleteAll();
+        postRepository.deleteAll();
         userRepository.deleteAll();
     }
 

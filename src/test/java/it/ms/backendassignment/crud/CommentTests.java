@@ -175,11 +175,14 @@ public class CommentTests {
     }
 
     @Test
-    void shouldUpdateComment() throws BAException {
+    void shouldUpdateComment() throws BAException, InterruptedException {
         UserDto user = createUser();
         PostDtoIn postIn = new PostDtoIn("A pretty title", "A pretty body", user.getUsername());
 
         PostDto out = postService.createPost(postIn);
+
+        //Wait a bit so the update date is different from the creation one
+        TimeUnit.SECONDS.sleep(1);
 
         CommentDtoIn commentIn = new CommentDtoIn();
         commentIn.setPostId(out.getId());
