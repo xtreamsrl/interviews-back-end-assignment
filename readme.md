@@ -46,6 +46,7 @@ We do understand that some topics might be unfamiliar for you. Therefore, pick a
 **Important**: you might feel like the tasks are somehow too broad, or the requirements are not
 fully elicited. **This is done on purpose**: we want to give you freedom to take your own choices and to put as fewer
 constraints as possible on your work. As an example, feel free to choose any technology you like for the database.
+
 ---   
 
 ### Problem Domain
