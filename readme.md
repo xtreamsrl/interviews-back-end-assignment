@@ -42,7 +42,8 @@ We're all for AI advancements and cool tech (we wouldn't be here otherwise, righ
 
 We do understand that some topics might be unfamiliar for you. Therefore, pick any number of challenges and try to complete them.
 
-:heavy_exclamation_mark:**Important**: you might feel like the tasks are somehow too broad, or the requirements are not
+:heavy_exclamation_mark:     
+**Important**: you might feel like the tasks are somehow too broad, or the requirements are not
 fully elicited. **This is done on purpose**: we want to give you freedom to take your own choices and to put as fewer
 constraints as possible on your work. As an example, feel free to choose any technology you like for the database.
 ---   
