@@ -1,4 +1,5 @@
 
+  
 <!---
 Hi! We're happy you opened this file, not everyone does!
 To let us know you did, paste a capybara picture 
@@ -9,20 +10,15 @@ in the How to Run section 😊
 
 ## Introduction
 
-This is an interview exercise for the Web & Mobile team of [xtream](https://www.linkedin.com/company/xtream-srl). In the
-following sections, you will find a number of challenges that we ask you to implement. You **DO NOT NECESSARILY need to
-complete 100% of them**, but rather only the ones you feel comfortable with or that interest you.
+This is an interview exercise for the Digital Products team of [xtream](https://www.linkedin.com/company/xtream-srl). In the following sections, you will find a number of challenges that we ask you to  implement. You **DO NOT NECESSARILY need to complete 100% of them**, but rather only the ones you feel comfortable with.
 
-:watch: We estimate it should take around 8 hours to solve the challenges, and we give you **1 week** to submit a
-solution, so that you can do it at your own pace.
+:watch: We estimate it should take around 8 hours to solve the challenges, and we give you **1 week** to submit a solution, so that you can do it at your own pace.
 
 ### Deliverables
 
-Simply fork this repository and work on it as if you were working on a real-world project assigned to you. A week from
-now, we will checkout your work and evaluate it.
+Simply fork this repository and work on it as if you were working on a real-world project assigned to you. A week from now, we will checkout your work and evaluate it. The fork can also be private, we will just share our accounts with you so you can grant read access.
 
-:heavy_exclamation_mark: **Important**: At the end of this README, you will find a "How to run" section that is not
-written out. Please, write there instructions on how to run your code.    
+:heavy_exclamation_mark: **Important**: At the end of this README, you will find a "How to run" section that is not written out. Please, write there instructions on how to run your code.    
 
 
 ### Evaluation
@@ -42,38 +38,32 @@ We're all for AI advancements and cool tech (we wouldn't be here otherwise, righ
 
 We do understand that some topics might be unfamiliar for you. Therefore, pick any number of challenges and try to complete them.
 
-:heavy_exclamation_mark:     
-**Important**: you might feel like the tasks are somehow too broad, or the requirements are not
-fully elicited. **This is done on purpose**: we want to give you freedom to take your own choices and to put as fewer
-constraints as possible on your work. As an example, feel free to choose any technology you like for the database.
+:heavy_exclamation_mark:**Important**: you might feel like the tasks are somehow too broad, or the requirements are not fully elicited. **This is done on purpose**: we want to give you the freedom to make your own choices and to put as fewer constraints as possible on your work. We appreciate if you could record any decisions, assumptions and doubts, together with any questions that you will ask in a real-world scenario. If you want to choose our stack instead, we generally work with TypeScript and NestJS.
 
 ---   
 
 ### Problem Domain
 
-Your task is to build the backend for an application that handles posts, comments, and user interactions. The end goal is to facilitate a timeline that displays posts and their corresponding comments.
+Your task is to build the backend for **FreshCart Market**, a simple grocery e-commerce website, where you can search for products, add to a cart, and pay for the products. The store has also a membership reward program: you gather points based on the amount spent and you can use them to get discounts. We need to focus on the customer part instead of the admin part that handles product list and available quantity. This part can be directly manipulated in the database. Do not consider authentication or sign in, imagine if the user that is interacting with the system is always the same.
 
 #### Challenge #1
 
-Design a web service that allows to manipulate posts and comments. A post can have a title and a body, while a comment only contains some text. The application needs to provide functionalities to retrieve, create, update, and delete posts and their corresponding comments. Posts and comments must be retrieved and ordered based on their last update date (e.g., the last update date of a post changes whenever a comment is added to it).
+Design an API to get the list of products available. Each product should have a name, an image, a price, the available quantity, and a category. The API is directly used in the Frontend of FreshCart Market, so consider the possible heavy load that receiving the whole list can generate and find a solution
 
 #### Challenge #2
 
-Consider a scenario where the application handles a significantly larger number of posts (~thousands). If necessary, redesign the API to efficiently retrieve them.
+The website can be also explored by category, so it has a left panel where the user can see all the categories and the number of products available in that category. When you click on the category the user can see all the products of that category. In the UI there is also an input that can be used to search for a specific product. 
 
 #### Challenge #3
 
-Introduce user management by adding APIs for user signup and login. Also, display user references within posts and comments. When posts and comments are fetched, relevant user info (name, userId, etc.) should be embedded within each entity. Consider providing a functionality to fetch all posts written by a particular user.
+For simplicity, the order and pay API receives all the products and the quantity together with the credit card. An external service must be used to get the money from the user. If the user has enough money the order is placed. 
 
 #### Challenge #4
 
-This application is great, and people are using so frequently that the number of posts and comments has grown too much! It's becoming difficult to find a post, and so the frontend team asks you to provide a search API so that a user can write some words inside a searchbar and load all the posts that contain those words. Can you help them?
+For every euro spent the user receives 1 point in the membership, and you can exchange 25 points for 1 euro of discount. Update the order placement API to update points on every placed order and check if the user wants to use its points to get a discount while paying. Moreover, there are special products that if present in the order, increase the amount of points assigned by a quantity specified in the product catalog itself.
 
-#### Challenge #5
-As the number of users and their interactions grow, we need to consider the database design's efficiency. How would you structure a database to handle the posts, comments, and users? Let's see your prowess in database design. Please also write a small paragraph to explain your choices.
-
-#### Challenge #6
-To ensure our application runs smoothly, we need to identify any potential bugs or issues. The solution? Testing, of course! Could you write some tests for your code to help us prevent potential meltdowns? Also, make sure to let us know how to run these tests. And remember, a good test is worth a thousand debugs!
+#### Challange #5
+Every grocery has some temporary discounts. FreshCart Market needs to consider that the administrator will insert in a table a list of products together with a percentage discount that will be applied only to a specific date range. Update the system to include this information in the whole process.
 
 
 ## How to run
