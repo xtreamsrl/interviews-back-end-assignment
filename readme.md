@@ -4,21 +4,22 @@
 Hi! We're happy you opened this file, not everyone does!
 To let us know you did, paste a capybara picture 
 in the How to Run section 😊 
+These will be extra points for you!
 -->
 
 # Backend Engineer Interview Assignment
 
 ## Introduction
 
-This is an interview exercise for the Digital Products team of [xtream](https://www.linkedin.com/company/xtream-srl). In the following sections, you will find a number of challenges that we ask you to  implement. You **DO NOT NECESSARILY need to complete 100% of them**, but rather only the ones you feel comfortable with.
+This is an interview exercise for the Digital Products team of [xtream](https://www.linkedin.com/company/xtream-srl). In the following sections, you will find a number of challenges that we ask you to implement. You **DO NOT NECESSARILY need to complete 100% of them**: you can choose to complete as many as you want.
 
-:watch: We estimate it should take around 8 hours to solve the challenges, and we give you **1 week** to submit a solution, so that you can do it at your own pace.
+:watch: We give you **1 week** to submit a solution, so that you can do it at your own pace. We are aware that you might have other commitments, so we are not expecting you to work on this full-time. You will be evaluated based on the quality of your work, not on the time you spent on it.
 
 ### Deliverables
 
-Simply fork this repository and work on it as if you were working on a real-world project assigned to you. A week from now, we will checkout your work and evaluate it. The fork can also be private, we will just share our accounts with you so you can grant read access.
+Simply fork this repository and work on it as if you were working on a real-world project assigned to you. A week from now, we will assess your work.
 
-:heavy_exclamation_mark: **Important**: At the end of this README, you will find a "How to run" section that is not written out. Please, write there instructions on how to run your code.    
+:heavy_exclamation_mark: **Important**: At the end of this README, you will find a "How to run" section that is not written out. Please, write there instructions on how to run your code: we will use this section to evaluate your work.
 
 
 ### Evaluation
@@ -32,7 +33,11 @@ Your work will be assessed according to several criteria. As an example, these i
 * Provided Documentation
 
 #### A Friendly Reminder:
-We're all for AI advancements and cool tech (we wouldn't be here otherwise, right?), but let's not outsource our fun to our silicon-based friends! We're really keen on getting to know your approach, your way of thinking and, of course, your wonderful mistakes along the way! So, while we totally get the allure of asking ChatGPT (or its cousins) to whip up a solution, we'd like this party to be strictly humans-only. Remember, it's the quirks, the head-scratching moments, and those glorious "Eureka!" instants that make us love this job. So go ahead, get your hands keyboard-deep in code, and show us what you got! Happy coding! 🎉💻🚀
+We’re all about embracing the latest in AI, including GPT and similar technologies. They’re great tools that can provide a helping hand, whether it’s for generating ideas, debugging, or refining solutions. However, for this coding challenge, we’re really keen to see your personal touch. We're interested in your thought process, decision-making, and the solutions you come up with.
+
+Remember, while using AI tools can be incredibly helpful, the essence of this task is to showcase your skills and creativity. Plus, be prepared to dive into the details of your code during the technical interview. Understanding the 'why' and 'how' behind your decisions is crucial, as it reflects your ability to critically engage with the technology you're using.
+
+So, feel free to lean on AI for support, but ensure your work remains distinctly yours. We're looking for a blend of technical savvy and individual flair. Dive in, get creative, and let’s see what you can create. Excited to see your work. Happy coding! 🚀💼👩‍💻
 
 ### Let's get started
 
