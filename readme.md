@@ -49,27 +49,41 @@ We do understand that some topics might be unfamiliar for you. Therefore, pick a
 
 ### Problem Domain
 
-Your task is to build the backend for **FreshCart Market**, a simple grocery e-commerce website, where you can search for products, add to a cart, and pay for the products. The store has also a membership reward program: you gather points based on the amount spent and you can use them to get discounts. We need to focus on the customer part instead of the admin part that handles product list and available quantity. This part can be directly manipulated in the database. Do not consider authentication or sign in, imagine if the user that is interacting with the system is always the same.
+Your task is to build the backend for **FreshCart Market**, a simple grocery e-commerce website, where you can search for products, add to a cart, and pay for the products.   
 
-#### Challenge #1
+The store also has a membership reward program: based on what you spend, you get points that you can use to get discounts.   
 
-Design an API to get the list of products available. Each product should have a name, an image, a price, the available quantity, and a category. The API is directly used in the Frontend of FreshCart Market, so consider the possible heavy load that receiving the whole list can generate and find a solution
+For the sake of this assignment, let's focus on creating the **customer** part instead of the **admin** part ( which handles all the products and their available quantities): the **admin** part can be directly manipulated in the database.   
 
-#### Challenge #2
+Do not consider authentication,sign in or multiple users: for simplicity, imagine the user that is interacting with the system is always the same.
 
-The website can be also explored by category, so it has a left panel where the user can see all the categories and the number of products available in that category. When you click on the category the user can see all the products of that category. In the UI there is also an input that can be used to search for a specific product. 
+#### Challenge #1: Available Products
 
-#### Challenge #3
+Design an API to get the list of the available products. Each product should have a name, an image, a price and the available quantity, and a category.   
+The frontend of FreshCart Market (which you don't need to develop) will use this API directly: consider the possible heavy load that receiving a large list of product can generate and propose a solution.
 
-For simplicity, the order and pay API receives all the products and the quantity together with the credit card. An external service must be used to get the money from the user. If the user has enough money the order is placed. 
+#### Challenge #2: Categories and Search
 
-#### Challenge #4
+The FreshCart website can be also explored by category: there is a left panel where the user can see all the categories and the number of products available in that category.  
+When users click on the category, they can see all the products for that category. There is also an input that can be used to search for a specific product. 
+Design an API (or multiple APIs) to allow these features.
 
-For every euro spent the user receives 1 point in the membership, and you can exchange 25 points for 1 euro of discount. Update the order placement API to update points on every placed order and check if the user wants to use its points to get a discount while paying. Moreover, there are special products that if present in the order, increase the amount of points assigned by a quantity specified in the product catalog itself.
+#### Challenge #3: Order & Payment
 
-#### Challange #5
-Every grocery has some temporary discounts. FreshCart Market needs to consider that the administrator will insert in a table a list of products together with a percentage discount that will be applied only to a specific date range. Update the system to include this information in the whole process.
+It's time to implement the order and payment part. The user can add products to the cart and then place the order. The order should contain the list of products and the quantity.   
+For simplicity, the API receives all this info together with the credit card details. If the user has enough money, the API will return a success message, otherwise, it will return an error message.
+An external service must be used to get the money from the user: you can find the swagger documentation in the file `payment-service.yaml`.
 
+#### Challenge #4: Reward Program
+
+For every euro spent, the user receives 1 reward point. 25 points equals 1 euro discount.   
+Update the order placement API (Challenge #3) to update points on every placed order.  
+Also update such API to allow the user to use the points to get a discount on the order.  
+Moreover, there are some special products that increase the amount of points earned: such property must be set in the product catalog.
+
+#### Challenge #5: Discounts
+Every grocery store has some temporary discounts. FreshCart Market needs to consider that the administrator will insert in a table a list of products together with a percentage discount that will be valid only for a specific date range.   
+Update the system to include this information in the whole process.
 
 ## How to run
 
