@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ProductDto } from './dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -29,6 +29,6 @@ export class ProductService {
   }
 
   fetchAllProducts() {
-    return ['product 1', 'product2'];
+    return this.prisma.product.findMany();
   }
 }

@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CategoryDto } from './dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -28,9 +28,7 @@ export class CategoryService {
     }
   }
 
-  // TODO: iplement
-
   fetchAllCategories() {
-    return ['cat 1', 'cat 2'];
+    return this.prisma.category.findMany();
   }
 }

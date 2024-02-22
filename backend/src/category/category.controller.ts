@@ -11,7 +11,6 @@ export class CategoryController {
     return this.categoryService.addCategory(dto)
   }
 
-  // TODO: iplement
   @Get('fetchallcategories')
   fetchAllProducts() {
     return this.categoryService.fetchAllCategories()
