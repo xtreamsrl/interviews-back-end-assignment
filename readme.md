@@ -87,4 +87,31 @@ Update the system to include this information in the whole process.
 
 ## How to run
 
-...
+- To run the tests:
+  
+  yarn test:e2e
+
+- It is also possible to run the tests when deveoloping:
+
+    yarn test:e2e:watch
+
+- To inspect the test-db:
+
+    npx dotenv -e .env.test.local prisma studio
+
+- To run the app:
+  
+    yarn start:dev
+
+- you will find the API documentation at:
+
+    http://localhost:3000/api-docs
+
+- To inspect the dev-db
+  
+    npx prisma studio
+
+- To refresh the dev-db
+
+    yarn db:dev:restart
+

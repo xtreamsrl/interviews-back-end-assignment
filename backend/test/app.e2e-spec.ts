@@ -129,5 +129,74 @@ describe('App e2e', () => {
           });
       });
     });
+
+    describe('add some product', () => {
+      for (let i = 0; i < 5; i++) {
+        // insert and test five times
+        it(`should add product with serialNo iteration ${i}`, () => {
+          const serialNoWithIteration = `AB456-${i}`; // change serialNo for each iteration
+          return pactum
+            .spec()
+            .post('/product/addproduct')
+            .withBody({
+              ...dto,
+              serialNo: serialNoWithIteration,
+              categoryId: '$S{categoryId}',
+            }) // use the modified serialNo
+            .expectStatus(201);
+        });
+      }
+    });
+
+    describe('fetch all products cursor', () => {
+      it('should fetch products without query params', async () => {
+        await pactum
+          .spec()
+          .get('/product/fetchallproductscursor')
+          .expectStatus(200)
+          .expectJsonLength(6);
+      });
+
+      it('should fetch a limited number of products with only take param', async () => {
+        await pactum
+          .spec()
+          .get('/product/fetchallproductscursor')
+          .withQueryParams({ take: '2' })
+          .expectStatus(200)
+          .expectJsonLength(2)
+          .stores('lastProductId', '[1].id');
+      });
+
+      it('should fech products with take and cursor params', async () => {
+        await pactum
+          .spec()
+          .get('/product/fetchallproductscursor')
+          .withQueryParams({
+            take: '4',
+            cursor: '$S{lastProductId}',
+          })
+          .expectStatus(200)
+          .expectJsonLength(4)
+          .expectJsonLike('3', {
+            serialNo: 'AB456-4',
+            name: dto.name,
+          });
+      });
+    });
+
+    describe('fetch all products cursor', () => {
+      it('should get', () => {
+        return pactum
+          .spec()
+          .get('/product/fetchallproductscursor')
+          .withQueryParams({ take: 2 })
+          .expectStatus(200)
+          .expectJsonLength(2)
+          .expectJsonLike('1', {
+            serialNo: 'AB456-0',
+            name: dto.name,
+          });
+      });
+    });
   });
 });
