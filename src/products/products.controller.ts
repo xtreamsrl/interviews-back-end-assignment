@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from '../models/product.model';
@@ -20,9 +21,12 @@ export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  async getProducts(): Promise<Product[]> {
+  async getProducts(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<Product[]> {
     try {
-      const products = await this.productsService.getProducts();
+      const products = await this.productsService.getProducts(page, limit);
       if (!products)
         throw new HttpException('Products not found', HttpStatus.NOT_FOUND);
       return products;

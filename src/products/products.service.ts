@@ -13,8 +13,15 @@ export class ProductsService {
     @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
-  async getProducts(): Promise<Product[]> {
-    const products = await this.productModel.find();
+  async getProducts(page: number, limit: number): Promise<Product[]> {
+    if (page <= 0 || limit <= 0) {
+      throw new HttpException(
+        'Invalid page or limit value.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const skip = (page - 1) * limit;
+    const products = await this.productModel.find().skip(skip).limit(limit);
     return products;
   }
   async addProduct(createProductDTO: CreateProductDTO): Promise<Product> {
