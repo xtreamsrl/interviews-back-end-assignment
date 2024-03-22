@@ -12,6 +12,7 @@ import { CategoriesModule } from './categories/categories.module';
       envFilePath: ['.env'],
       isGlobal: true,
     }),
+
     MongooseModule.forRoot(process.env.MONGO_URI),
     ProductsModule,
     CategoriesModule,
