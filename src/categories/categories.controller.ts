@@ -18,6 +18,7 @@ import {
   CreateCategoryDTO,
   UpdateCategoryDTO,
 } from './dtos/create-category.dto';
+import { Product } from '../models/product.model';
 
 @Controller('categories')
 export class CategoriesController {
@@ -113,5 +114,19 @@ export class CategoriesController {
       deletedCategories.push(deletedCategory);
     }
     return deletedCategories;
+  }
+
+  @Get(':categoryId/products')
+  async getProductsByCategory(
+    @Param('categoryId') categoryId: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<Product[]> {
+    const products = await this.categoriesService.getProductsByCategory(
+      categoryId,
+      page,
+      limit,
+    );
+    return products;
   }
 }

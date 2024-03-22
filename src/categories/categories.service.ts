@@ -6,12 +6,16 @@ import {
   CreateCategoryDTO,
   UpdateCategoryDTO,
 } from './dtos/create-category.dto';
+import { Product } from '../models/product.model';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name)
     private readonly categoryModel: Model<Category>,
+
+    @InjectModel(Product.name)
+    private productModel: Model<Product>,
   ) {}
 
   async getCategories(page?: number, limit?: number): Promise<Category[]> {
@@ -49,5 +53,17 @@ export class CategoriesService {
   async deleteCategory(id: string): Promise<Category> {
     const category = await this.categoryModel.findByIdAndDelete(id);
     return category;
+  }
+
+  async getProductsByCategory(
+    categoryId: string,
+    page: number,
+    limit: number,
+  ): Promise<Product[]> {
+    const products = await this.productModel
+      .find({ category: categoryId })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return products;
   }
 }
