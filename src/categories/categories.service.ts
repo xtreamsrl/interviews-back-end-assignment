@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Category } from 'src/models/category.model';
@@ -14,8 +14,14 @@ export class CategoriesService {
     private readonly categoryModel: Model<Category>,
   ) {}
 
-  async getCategories(): Promise<Category[]> {
-    return this.categoryModel.find();
+  async getCategories(page?: number, limit?: number): Promise<Category[]> {
+    if (page <= 0 || limit <= 0)
+      throw new HttpException(
+        'Invalid page or limit value.',
+        HttpStatus.BAD_REQUEST,
+      );
+    const skip = (page - 1) * limit;
+    return this.categoryModel.find().skip(skip).limit(limit);
   }
 
   async addCategory(createCategoryDTO: CreateCategoryDTO): Promise<Category> {

@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from '../models/category.model';
@@ -23,9 +24,15 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Get()
-  async getCategories(): Promise<Category[]> {
+  async getCategories(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<Category[]> {
     try {
-      const categories = await this.categoriesService.getCategories();
+      const categories = await this.categoriesService.getCategories(
+        page,
+        limit,
+      );
       if (!categories)
         throw new HttpException('Categories not found', HttpStatus.NOT_FOUND);
       return categories;

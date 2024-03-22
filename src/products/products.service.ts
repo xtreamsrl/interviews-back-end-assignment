@@ -13,7 +13,7 @@ export class ProductsService {
     @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
-  async getProducts(page: number, limit: number): Promise<Product[]> {
+  async getProducts(page?: number, limit?: number): Promise<Product[]> {
     if (page <= 0 || limit <= 0) {
       throw new HttpException(
         'Invalid page or limit value.',
