@@ -53,10 +53,24 @@ export class ProductsController {
   }
 
   @Post()
-  async addProduct(@Body() createProductDTO: CreateProductDTO) {
+  async addProduct(
+    @Body() createProductDTOs: CreateProductDTO | CreateProductDTO[],
+  ) {
     try {
-      const product = await this.productsService.addProduct(createProductDTO);
-      return product;
+      if (Array.isArray(createProductDTOs)) {
+        const products = await Promise.all(
+          createProductDTOs.map(async (createProductDTO) => {
+            const product =
+              await this.productsService.addProduct(createProductDTO);
+            return product;
+          }),
+        );
+        return products;
+      } else {
+        const product =
+          await this.productsService.addProduct(createProductDTOs);
+        return product;
+      }
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
