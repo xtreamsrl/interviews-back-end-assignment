@@ -35,20 +35,16 @@ export class ProductsService {
     id: string,
     updateProductDTO: UpdateProductDTO,
   ): Promise<Product> {
-    try {
-      const product = await this.productModel.findByIdAndUpdate(
-        id,
-        updateProductDTO,
-        { new: true },
-      );
+    const product = await this.productModel.findByIdAndUpdate(
+      id,
+      updateProductDTO,
+      { new: true },
+    );
 
-      return product;
-    } catch (error) {
-      throw new Error(error);
-    }
+    return product;
   }
 
-  async deleteProduct(id: string): Promise<any> {
+  async deleteProduct(id: string): Promise<Product> {
     const product = await this.productModel.findByIdAndDelete(id);
     return product;
   }
