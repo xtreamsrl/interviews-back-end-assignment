@@ -31,6 +31,15 @@ export class ProductsController {
     return products;
   }
 
+  @Get('/search')
+  async searchProductsByName(@Query('name') name: string): Promise<Product[]> {
+    if (!name) {
+      return [];
+    }
+    const products = await this.productsService.searchProductsByName(name);
+    return products;
+  }
+
   @Get(':id')
   async getProductById(@Param('id') id: string): Promise<Product> {
     const isValid = mongoose.Types.ObjectId.isValid(id);

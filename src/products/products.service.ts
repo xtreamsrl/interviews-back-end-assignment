@@ -33,6 +33,13 @@ export class ProductsService {
     return newProduct.save();
   }
 
+  async searchProductsByName(name: string): Promise<Product[]> {
+    const products = await this.productModel.find({
+      name: { $regex: name, $options: 'i' },
+    });
+    return products;
+  }
+
   async getProductById(id: string): Promise<Product> {
     const product = await this.productModel.findById(id);
     return product;
