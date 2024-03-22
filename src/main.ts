@@ -4,18 +4,18 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const logger = new Logger(); // initialize nest logger
-  let port;
+  const logger = new Logger();
+  const env: string | undefined = process.env.NODE_ENV;
+  let port: number;
+  const DOMAIN: string | undefined =
+    env === 'dev' ? 'localhost' : process.env.DOMAIN;
 
-  const env = process.env.NODE_ENV;
-  const http = env === 'prod' ? 'https' : 'http';
-  const DOMAIN = env === 'dev' && 'localhost';
+  const http: string = env === 'dev' ? 'http' : 'https';
 
-  console.log(port);
-  if (process.env.NODE_ENV === 'dev') {
-    port = process.env.PORT_DEV;
-  } else if (process.env.NODE_ENV === 'prod') {
-    port = process.env.PORT_PROD; //currently there is no production environment
+  if (env === 'dev') {
+    port = parseInt(process.env.PORT_DEV || '3000');
+  } else if (env === 'prod') {
+    port = parseInt(process.env.PORT_DEV || '3000');
   }
   const DNS = `${http}://${DOMAIN}:${port}`;
 
