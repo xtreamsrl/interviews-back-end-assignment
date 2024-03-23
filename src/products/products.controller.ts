@@ -32,11 +32,14 @@ export class ProductsController {
   }
 
   @Get('/search')
-  async searchProductsByName(@Query('name') name: string): Promise<Product[]> {
-    if (!name) {
-      return [];
+  async searchProductsByName(
+    @Query() queryParams: Record<string, any>,
+  ): Promise<Product[]> {
+    if (!queryParams) {
+      return await this.productsService.getProducts();
     }
-    const products = await this.productsService.searchProductsByName(name);
+    const products =
+      await this.productsService.searchProductsByName(queryParams);
     return products;
   }
 

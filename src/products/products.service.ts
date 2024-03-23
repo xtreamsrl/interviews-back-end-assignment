@@ -33,10 +33,20 @@ export class ProductsService {
     return newProduct.save();
   }
 
-  async searchProductsByName(name: string): Promise<Product[]> {
-    const products = await this.productModel.find({
-      name: { $regex: name, $options: 'i' },
+  async searchProductsByName(
+    queryParams: Record<string, any>,
+  ): Promise<Product[]> {
+    const fields = Object.keys(queryParams);
+    const query = {};
+    fields.forEach((field) => {
+      if (isNaN(queryParams[field]))
+        query[field] = {
+          $regex: new RegExp(queryParams[field]),
+          $options: 'i',
+        };
     });
+
+    const products = await this.productModel.find(query);
     return products;
   }
 
