@@ -39,7 +39,7 @@ export class ProductsController {
       return await this.productsService.getProducts();
     }
     const products =
-      await this.productsService.searchProductsByName(queryParams);
+      await this.productsService.getFilteredProducts(queryParams);
     return products;
   }
 

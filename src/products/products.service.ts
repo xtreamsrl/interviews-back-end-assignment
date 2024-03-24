@@ -3,14 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Product } from 'src/models/product.model';
 import { CreateProductDTO, UpdateProductDTO } from './dtos/create-product.dto';
 import { Model, Types } from 'mongoose';
-import { Category } from '../models/category.model';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private productModel: Model<Product>,
-    @InjectModel(Category.name) private categoryModel: Model<Category>,
+    private readonly categoryService: CategoriesService,
   ) {}
 
   async getProducts(page?: number, limit?: number): Promise<Product[]> {
@@ -26,17 +26,21 @@ export class ProductsService {
   }
   async addProduct(createProductDTO: CreateProductDTO): Promise<Product> {
     const { category }: { category: Types.ObjectId } = createProductDTO;
-    const foundCategory = await this.categoryModel.findById(category);
+    const foundCategory = await this.categoryService.getCategoryById(
+      category.toString(),
+    );
     if (category && !foundCategory)
       throw new HttpException('category not found', HttpStatus.NOT_FOUND);
     const newProduct = await this.productModel.create(createProductDTO);
     return newProduct.save();
   }
 
-  async searchProductsByName(
+  async getFilteredProducts(
     queryParams: Record<string, any>,
   ): Promise<Product[]> {
     const fields = Object.keys(queryParams);
+
+    console.log(fields);
     const query = {};
     fields.forEach((field) => {
       if (isNaN(queryParams[field]))

@@ -119,14 +119,9 @@ export class CategoriesController {
   @Get(':categoryId/products')
   async getProductsByCategory(
     @Param('categoryId') categoryId: string,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
   ): Promise<Product[]> {
-    const products = await this.categoriesService.getProductsByCategory(
-      categoryId,
-      page,
-      limit,
-    );
+    const products =
+      await this.categoriesService.getProductsByCategory(categoryId);
     return products;
   }
 }
