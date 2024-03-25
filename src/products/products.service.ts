@@ -39,8 +39,6 @@ export class ProductsService {
     queryParams: Record<string, any>,
   ): Promise<Product[]> {
     const fields = Object.keys(queryParams);
-
-    console.log(fields);
     const query = {};
     fields.forEach((field) => {
       if (isNaN(queryParams[field]))
