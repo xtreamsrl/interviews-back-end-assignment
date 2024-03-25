@@ -8,8 +8,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { AuthService } from './auth.service';
+import { AdminGuard } from '../guard/admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
