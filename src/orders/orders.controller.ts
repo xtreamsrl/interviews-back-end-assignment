@@ -13,7 +13,6 @@ import { OrdersService } from './orders.service';
 import { Order } from '../models/order.model';
 import { CreateOrderDto, UpdateOrderDTO } from './dtos/create-order.dto';
 import { AuthGuard } from '../guard/auth.guard';
-import { AdminGuard } from '../guard/admin.guard';
 
 @Controller('orders')
 export class OrdersController {
@@ -28,7 +27,7 @@ export class OrdersController {
     return order;
   }
 
-  @UseGuards(AuthGuard, AdminGuard)
+  @UseGuards(AuthGuard)
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
     try {
@@ -42,7 +41,7 @@ export class OrdersController {
     }
   }
 
-  @UseGuards(AuthGuard, AdminGuard)
+  @UseGuards(AuthGuard)
   @Put(':id')
   async updateOrder(
     @Param('id') id: string,
