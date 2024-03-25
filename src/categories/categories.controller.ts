@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from '../models/category.model';
@@ -19,6 +20,8 @@ import {
   UpdateCategoryDTO,
 } from './dtos/create-category.dto';
 import { Product } from '../models/product.model';
+import { AuthGuard } from '../guard/auth.guard';
+import { AdminGuard } from '../guard/admin.guard';
 
 @Controller('categories')
 export class CategoriesController {
@@ -49,7 +52,7 @@ export class CategoriesController {
     }
     return category;
   }
-
+  @UseGuards(AuthGuard, AdminGuard)
   @Post()
   async addCategories(
     @Body() createCategoryDTOs: CreateCategoryDTO | CreateCategoryDTO[],
@@ -69,7 +72,7 @@ export class CategoriesController {
       return category;
     }
   }
-
+  @UseGuards(AuthGuard, AdminGuard)
   @Put(':id')
   async updateCategory(
     @Param('id') id: string,
@@ -90,7 +93,7 @@ export class CategoriesController {
     }
     return updatedCategory;
   }
-
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete(':id')
   async deleteCategory(@Param('id') id: string): Promise<Category> {
     const deletedCategory = await this.categoriesService.deleteCategory(id);
@@ -99,7 +102,7 @@ export class CategoriesController {
 
     return deletedCategory;
   }
-
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete()
   async deleteCategories(@Body() ids: string[]): Promise<Category[]> {
     const deletedCategories = [];

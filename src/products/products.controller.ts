@@ -10,11 +10,14 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from '../models/product.model';
 import { CreateProductDTO, UpdateProductDTO } from './dtos/create-product.dto';
 import mongoose from 'mongoose';
+import { AuthGuard } from '../guard/auth.guard';
+import { AdminGuard } from '../guard/admin.guard';
 
 @Controller('products')
 export class ProductsController {
@@ -58,6 +61,7 @@ export class ProductsController {
     return product;
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Post()
   async addProduct(
     @Body() createProductDTOs: CreateProductDTO | CreateProductDTO[],
@@ -77,6 +81,7 @@ export class ProductsController {
     }
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Put(':id')
   async updateProduct(
     @Param('id') id: string,
@@ -98,6 +103,7 @@ export class ProductsController {
     return updatedProduct;
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete(':id')
   async deleteProduct(@Param('id') id: string): Promise<Product> {
     const deletedProduct = await this.productsService.deleteProduct(id);
@@ -106,6 +112,7 @@ export class ProductsController {
     return deletedProduct;
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete()
   async deleteProducts(@Body() ids: string[]): Promise<Product[]> {
     const deletedProducts = [];
