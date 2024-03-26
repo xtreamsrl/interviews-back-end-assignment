@@ -223,8 +223,6 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
-## Api documentation
-
 ## 5. Built with 🛠️
 
 This project is build with:

@@ -1,0 +1,87 @@
+swagger: '2.0'
+info:
+  title: Payment Service API
+  description: API for processing payments via credit card
+  version: '1.0.0'
+host: 'paymentservice.example.com'
+schemes:
+  - https
+basePath: '/api'
+produces:
+  - application/json
+paths:
+  /payment:
+    post:
+      summary: Process a payment
+      description: Processes a payment using credit card information, returning a transaction ID and status.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: paymentRequest
+          description: Payment request object
+          required: true
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+      responses:
+        200:
+          description: Payment processed successfully
+          schema:
+            $ref: '#/definitions/PaymentResponse'
+        400:
+          description: Invalid request provided
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  PaymentRequest:
+    type: object
+    required:
+      - cardNumber
+      - expiryMonth
+      - expiryYear
+      - cvv
+      - amount
+    properties:
+      cardNumber:
+        type: string
+        example: '4111111111111111'
+      expiryMonth:
+        type: string
+        example: '12'
+      expiryYear:
+        type: string
+        example: '2023'
+      cvv:
+        type: string
+        example: '123'
+      amount:
+        type: number
+        format: double
+        example: 100.00
+
+  PaymentResponse:
+    type: object
+    properties:
+      transactionId:
+        type: string
+        example: 'tx_123456789'
+      status:
+        type: string
+        example: 'approved'
+        enum:
+          - approved
+          - declined
+          - error
+
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
