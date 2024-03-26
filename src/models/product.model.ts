@@ -21,8 +21,8 @@ export class Product extends Document {
   @Prop({ type: Number, required: true })
   availableQuantity: number;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'Category', required: true })
-  category: mongoose.Schema.Types.ObjectId;
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'Category', required: false })
+  category: mongoose.Schema.Types.ObjectId | any;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

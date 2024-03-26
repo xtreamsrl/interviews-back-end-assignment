@@ -13,6 +13,7 @@ export default async function calculateTotalPrice({
     const product = await productService.getProductById(
       item.product._id.toString(),
     );
+
     totalPrice += product.price * item.quantity;
   }
   return totalPrice;
