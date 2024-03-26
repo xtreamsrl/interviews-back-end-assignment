@@ -84,7 +84,7 @@ Moreover, there are some special products that increase the amount of points ear
 Every grocery store has some temporary discounts. FreshCart Market needs to consider that the administrator will insert in a table a list of products together with a percentage discount that will be valid only for a specific date range.  
 Update the system to include this information in the whole process.
 
-## Getting started
+## 1. Getting started
 
 ### 1.1 Requirements
 
@@ -94,7 +94,7 @@ Before starting, make sure you have at least those components on your workstatio
 
 ### 1.2 Project configuration
 
-Start by cloning this project on your workstation or click on ["Use this template"](https://github.com/new?template_name=nestjs-template&template_owner=Saluki) in Github.
+Start by cloning this project on your workstation or click on ["Use this template"](https://github.com/RLIN2001/cart-backend-nest.git) in Github.
 
 ```sh
 git clone https://github.com/RLIN2001/cart-backend-nest.git my-project
