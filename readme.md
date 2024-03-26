@@ -184,7 +184,7 @@ This template was made with a well-defined directory structure.
 └── tsconfig.json
 ```
 
-## How to run
+## 3. How to run
 
 ### Running the app
 
@@ -212,7 +212,9 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
-## Built with 🛠️
+## Api documentation
+
+## 5. Built with 🛠️
 
 This project is build with:
 

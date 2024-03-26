@@ -6,11 +6,12 @@ import {
   HttpStatus,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../guard/auth.guard';
 import { AuthService } from './auth.service';
-import { AdminGuard } from '../guard/admin.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -18,19 +19,30 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.email, signInDto.password);
+  signIn(@Body() signInDto: Record<string, any>, @Res() res: Response) {
+    const login = this.authService.signIn(signInDto.email, signInDto.password);
+    return res.status(HttpStatus.OK).json({
+      message: 'login successfully',
+      data: login,
+    });
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  register(@Body() registerDto: Record<string, any>) {
-    return this.authService.register(registerDto);
+  register(@Body() registerDto: Record<string, any>, @Res() res: Response) {
+    const user = this.authService.register(registerDto);
+    return res.status(HttpStatus.OK).json({
+      message: 'registration successfully registered',
+      data: user,
+    });
   }
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@Request() req, @Res() res: Response) {
+    return res.status(HttpStatus.OK).json({
+      message: 'profile found with success',
+      data: req.user,
+    });
   }
 }

@@ -7,13 +7,13 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { Order } from '../models/order.model';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { AuthGuard } from '../guard/auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 @Controller('orders')
@@ -25,7 +25,8 @@ export class OrdersController {
   async getOrderById(
     @Param('id') id: string,
     @Req() req: Request,
-  ): Promise<Order> {
+    @Res() res: Response,
+  ) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid)
       throw new HttpException(
@@ -38,7 +39,11 @@ export class OrdersController {
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
-    return order;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'get order successfully',
+      data: order,
+    });
   }
 
   @UseGuards(AuthGuard)
@@ -46,7 +51,8 @@ export class OrdersController {
   async createOrder(
     @Body() createOrderDto: CreateOrderDto,
     @Req() req: Request,
-  ): Promise<Order> {
+    @Res() res: Response,
+  ) {
     const isValid = mongoose.Types.ObjectId.isValid(createOrderDto.cart);
     if (!isValid)
       throw new HttpException(
@@ -61,6 +67,9 @@ export class OrdersController {
       createOrderDto,
     );
 
-    return createdOrder;
+    return res.status(HttpStatus.OK).json({
+      message: 'create order successfully',
+      data: createdOrder,
+    });
   }
 }

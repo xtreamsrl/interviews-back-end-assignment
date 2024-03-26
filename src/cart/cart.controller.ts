@@ -10,12 +10,13 @@ import {
   Put,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { Cart } from '../models/cart.model';
 import { CreateCartDto, UpdateCartDTO } from './dtos/create-cart.dto';
 import { AuthGuard } from '../guard/auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AdminGuard } from '../guard/admin.guard';
 
 @Controller('carts')
@@ -24,41 +25,51 @@ export class CartController {
 
   @UseGuards(AuthGuard)
   @Get('user')
-  async getCartsByUser(@Req() req: Request) {
+  async getCartsByUser(@Req() req: Request, @Res() res: Response) {
     const user = req['user'];
     const carts = await this.cartService.getCartsByUserId(user.user._id);
-    return {
+
+    return res.status(HttpStatus.OK).json({
       message: 'Carts retrieved successfully',
-      carts: carts,
-    };
+      data: carts,
+    });
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @Get()
-  async getAllCarts() {
+  async getAllCarts(@Res() res: Response) {
     const carts = await this.cartService.getAllCarts();
-    return {
+    return res.status(HttpStatus.OK).json({
       message: 'All carts retrieved successfully',
-      carts: carts,
-    };
+      data: carts,
+    });
   }
   @UseGuards(AuthGuard)
   @Post()
-  async createCart(@Body() CartItemDto: CreateCartDto, @Req() req: Request) {
+  async createCart(
+    @Body() CartItemDto: CreateCartDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const user = req['user'];
     const newCart: Cart = await this.cartService.createCart(
       user.user._id,
       CartItemDto,
     );
-    return {
+
+    return res.status(HttpStatus.OK).json({
       message: 'Cart created successfully',
-      cart: newCart,
-    };
+      data: newCart,
+    });
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  async findCartById(@Param('id') cartId: string, @Req() req: Request) {
+  async findCartById(
+    @Param('id') cartId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const user = req['user'];
 
     const cart = await this.cartService.findCartById(
@@ -68,15 +79,20 @@ export class CartController {
     if (!cart) {
       throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
-    return {
+
+    return res.status(HttpStatus.OK).json({
       message: 'Cart found successfully',
-      cart: cart,
-    };
+      data: cart,
+    });
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteCart(@Param('id') cartId: string, @Req() req: Request) {
+  async deleteCart(
+    @Param('id') cartId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const user = req['user'];
 
     const deletedCart = await this.cartService.deleteCart(
@@ -86,10 +102,11 @@ export class CartController {
     if (!deletedCart) {
       throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
-    return {
+
+    return res.status(HttpStatus.OK).json({
       message: 'Cart deleted successfully',
-      cart: deletedCart,
-    };
+      data: deletedCart,
+    });
   }
 
   @UseGuards(AuthGuard)
@@ -98,6 +115,7 @@ export class CartController {
     @Param('id') cartId: string,
     @Body() updateCartDto: UpdateCartDTO,
     @Req() req: Request,
+    @Res() res: Response,
   ) {
     const user = req['user'];
     const updatedCart = await this.cartService.updateCart(
@@ -108,9 +126,10 @@ export class CartController {
     if (!updatedCart) {
       throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
-    return {
+
+    return res.status(HttpStatus.OK).json({
       message: 'Cart updated successfully',
-      cart: updatedCart,
-    };
+      data: updatedCart,
+    });
   }
 }

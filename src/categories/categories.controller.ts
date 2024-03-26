@@ -10,18 +10,18 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { Category } from '../models/category.model';
 import mongoose from 'mongoose';
 import {
   CreateCategoryDTO,
   UpdateCategoryDTO,
 } from './dtos/create-category.dto';
-import { Product } from '../models/product.model';
 import { AuthGuard } from '../guard/auth.guard';
 import { AdminGuard } from '../guard/admin.guard';
+import { Response } from 'express';
 
 @Controller('categories')
 export class CategoriesController {
@@ -31,15 +31,20 @@ export class CategoriesController {
   async getCategories(
     @Query('page') page: number,
     @Query('limit') limit: number,
-  ): Promise<Category[]> {
+    @Res() res: Response,
+  ) {
     const categories = await this.categoriesService.getCategories(page, limit);
     if (!categories)
       throw new HttpException('Categories not found', HttpStatus.NOT_FOUND);
-    return categories;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'category found',
+      data: categories,
+    });
   }
 
   @Get(':id')
-  async getCategoryById(@Param('id') id: string): Promise<Category> {
+  async getCategoryById(@Param('id') id: string, @Res() res: Response) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid)
       throw new HttpException(
@@ -50,12 +55,17 @@ export class CategoriesController {
     if (!category) {
       throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
     }
-    return category;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'category found',
+      data: category,
+    });
   }
   @UseGuards(AuthGuard, AdminGuard)
   @Post()
   async addCategories(
     @Body() createCategoryDTOs: CreateCategoryDTO | CreateCategoryDTO[],
+    @Res() res: Response,
   ) {
     if (Array.isArray(createCategoryDTOs)) {
       const categories = await Promise.all(
@@ -65,11 +75,18 @@ export class CategoriesController {
           return category;
         }),
       );
-      return categories;
+      return res.status(HttpStatus.OK).json({
+        message: 'categories added successfully',
+        data: categories,
+      });
     } else {
       const category =
         await this.categoriesService.addCategory(createCategoryDTOs);
-      return category;
+
+      return res.status(HttpStatus.OK).json({
+        message: 'category added successfully',
+        data: category,
+      });
     }
   }
   @UseGuards(AuthGuard, AdminGuard)
@@ -77,7 +94,8 @@ export class CategoriesController {
   async updateCategory(
     @Param('id') id: string,
     @Body() updateCategoryDTO: UpdateCategoryDTO,
-  ): Promise<Category> {
+    @Res() res: Response,
+  ) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid)
       throw new HttpException(
@@ -91,20 +109,27 @@ export class CategoriesController {
     if (!updatedCategory) {
       throw new NotFoundException('Category does not exist!');
     }
-    return updatedCategory;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'category updated successfully',
+      data: updatedCategory,
+    });
   }
   @UseGuards(AuthGuard, AdminGuard)
   @Delete(':id')
-  async deleteCategory(@Param('id') id: string): Promise<Category> {
+  async deleteCategory(@Param('id') id: string, @Res() res: Response) {
     const deletedCategory = await this.categoriesService.deleteCategory(id);
     if (!deletedCategory)
       throw new NotFoundException('Category does not exist!');
 
-    return deletedCategory;
+    return res.status(HttpStatus.OK).json({
+      message: 'category deleted successfully',
+      data: deletedCategory,
+    });
   }
   @UseGuards(AuthGuard, AdminGuard)
   @Delete()
-  async deleteCategories(@Body() ids: string[]): Promise<Category[]> {
+  async deleteCategories(@Body() ids: string[], @Res() res: Response) {
     const deletedCategories = [];
     for (const id of ids) {
       const deletedCategory = await this.categoriesService.deleteCategory(id);
@@ -116,15 +141,24 @@ export class CategoriesController {
       }
       deletedCategories.push(deletedCategory);
     }
-    return deletedCategories;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'categories deleted successfully',
+      data: deletedCategories,
+    });
   }
 
   @Get(':categoryId/products')
   async getProductsByCategory(
     @Param('categoryId') categoryId: string,
-  ): Promise<Product[]> {
+    @Res() res: Response,
+  ) {
     const products =
       await this.categoriesService.getProductsByCategory(categoryId);
-    return products;
+
+    return res.status(HttpStatus.OK).json({
+      message: 'get products by category successfully',
+      data: products,
+    });
   }
 }
