@@ -113,6 +113,17 @@ Once the dependencies are installed, you can now configure your project by creat
 .env
 ```
 
+File .env for run the project:
+
+```
+NODE_ENV=dev
+PORT_DEV=3000
+PORT_PROD=80
+DOMAIN=example.com
+MONGO_URI=mongodb+srv://chenweiriccardolin:8mjLDz9xq89CwYuu@cluster0.fstl1n3.mongodb.net/freshMarket?retryWrites=true&w=majority&appName=Cluster0
+
+```
+
 ## 2. Project structure
 
 This template was made with a well-defined directory structure.
