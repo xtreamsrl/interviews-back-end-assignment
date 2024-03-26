@@ -186,4 +186,37 @@ This template was made with a well-defined directory structure.
 
 ## How to run
 
-...
+### Running the app
+
+```bash
+# development
+$ yarn run start
+
+# watch mode
+$ yarn run start:dev
+
+# production mode
+$ yarn run start:prod
+```
+
+### Test mode
+
+```bash
+# unit tests
+$ yarn run test
+
+# e2e tests
+$ yarn run test:e2e
+
+# test coverage
+$ yarn run test:cov
+```
+
+## Built with 🛠️
+
+This project is build with:
+
+- [NestJS](https://nestjs.com/) - Backend framework used
+- [MongoDB](https://www.mongodb.com/it-it) - Used as my database
+- [Postman](https://www.postman.com/) - Used to test and document my endpoints
+- [NPM](https://www.npmjs.com/) - Dependency manager
