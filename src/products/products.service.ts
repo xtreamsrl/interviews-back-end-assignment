@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from 'src/models/product.model';
 import { CreateProductDTO, UpdateProductDTO } from './dtos/create-product.dto';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
@@ -24,11 +24,10 @@ export class ProductsService {
     const products = await this.productModel.find().skip(skip).limit(limit);
     return products;
   }
+
   async addProduct(createProductDTO: CreateProductDTO): Promise<Product> {
-    const { category }: { category: Types.ObjectId } = createProductDTO;
-    const foundCategory = await this.categoryService.getCategoryById(
-      category.toString(),
-    );
+    const { category }: { category: string } = createProductDTO;
+    const foundCategory = await this.categoryService.getCategoryById(category);
     if (category && !foundCategory)
       throw new HttpException('category not found', HttpStatus.NOT_FOUND);
     const newProduct = await this.productModel.create(createProductDTO);

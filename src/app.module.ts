@@ -1,16 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
-import { CartService } from './cart/cart.service';
-import { CartController } from './cart/cart.controller';
-import { CartModule } from './cart/cart.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CartModule } from './cart/cart.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -23,11 +20,10 @@ import { UsersModule } from './users/users.module';
     ProductsModule,
     CategoriesModule,
     OrdersModule,
-    CartModule,
     AuthModule,
     UsersModule,
+    CartModule,
+    PaymentModule,
   ],
-  controllers: [AppController, CartController],
-  providers: [AppService, CartService],
 })
 export class AppModule {}

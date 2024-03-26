@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '../models/user.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -25,5 +25,20 @@ export class UsersService {
   async createUser(userDto: Partial<User>): Promise<User | null> {
     const newUser = await this.userModel.create(userDto);
     return newUser;
+  }
+
+  async updateRewardPoints(
+    userId: string,
+    rewardPoints: number,
+  ): Promise<User | null> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    user.rewardPoints += rewardPoints;
+
+    const updatedUser = await user.save();
+
+    return updatedUser;
   }
 }

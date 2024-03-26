@@ -1,194 +1,119 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Order } from '../models/order.model';
-import { OrdersService } from '../orders/orders.service';
-import { ProductsService } from '../products/products.service';
-import { ItemDto } from '../orders/dtos/create-order.dto';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Cart } from '../models/cart.model';
+import { CreateCartDto, UpdateCartDTO } from './dtos/create-cart.dto';
 import calculateTotalPrice from './functions';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class CartService {
   constructor(
-    private readonly orderService: OrdersService,
+    @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
     private readonly productService: ProductsService,
   ) {}
 
-  async addItemToCart(itemDto: ItemDto): Promise<any> {
-    const orderId = '66017292853ed44d15e30595';
-    const order = await this.orderService.getOrderById(orderId);
-    console.log(itemDto);
-    const product = await this.productService.getProductById(
-      itemDto.product_id.toString(),
-    );
-    if (!product)
-      throw new HttpException('product not found', HttpStatus.NOT_FOUND);
+  async createCart(
+    userId: string,
+    createCartDto: CreateCartDto,
+  ): Promise<Cart> {
+    const newCart = await this.cartModel.create({
+      user: userId,
+      cartItems: createCartDto.cartItems,
+      name: createCartDto.name,
+    });
+    const total = await calculateTotalPrice({
+      cart: newCart,
+      productService: this.productService,
+    });
 
-    // Check if the product is already in the cart
-    const existingProductIndex = order.products.findIndex(
-      (item) => item.product_id.toString() === itemDto.product_id.toString(),
-    );
-    if (existingProductIndex !== -1) {
-      // If the product is already in the cart,give an error
-      throw new Error('Product is already exists on the cart');
-    } else {
-      // If the product is not in the cart, add a new item to the products list
-      order.products.push({
-        product_id: itemDto.product_id,
-        quantity: itemDto.quantity || 1,
+    newCart.set({ total });
+    return newCart.save();
+  }
+
+  async findCartById(userId: string, cartId: string): Promise<Cart> {
+    const cart = await this.cartModel.findById(cartId);
+    if (cart && cart.user.toString() !== userId)
+      throw new UnauthorizedException(
+        'You are not authorized to get this cart',
+      );
+    return cart;
+  }
+
+  async getCartsByUserId(userId: string): Promise<Cart[]> {
+    const carts = await this.cartModel.find({ user: userId });
+    return carts;
+  }
+
+  async getAllCarts(): Promise<Cart[]> {
+    const carts = await this.cartModel.find();
+    return carts;
+  }
+
+  async deleteCart(userId: string, cartId: string): Promise<Cart> {
+    const cart = await this.cartModel.findById(cartId);
+    if (cart && cart.user.toString() !== userId)
+      throw new UnauthorizedException(
+        'You are not authorized to delete this cart',
+      );
+
+    const deletedCart = await this.cartModel.findByIdAndDelete(cartId);
+    return deletedCart;
+  }
+
+  async updateCart(
+    userId: string,
+    cartId: string,
+    updateCartDto: UpdateCartDTO,
+  ): Promise<Cart> {
+    const existingCart = await this.cartModel.findById(cartId);
+
+    if (existingCart && existingCart.user.toString() !== userId)
+      throw new UnauthorizedException(
+        'You are not authorized to update this cart',
+      );
+
+    if (!existingCart) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    if (updateCartDto.name !== existingCart.name)
+      existingCart.set({ name: updateCartDto.name });
+
+    if (updateCartDto.cartItems && updateCartDto.cartItems.length > 0) {
+      updateCartDto.cartItems.forEach((updateCartItem) => {
+        const existingCartItemIndex = existingCart.cartItems.findIndex(
+          (item) =>
+            item.product.toString() === updateCartItem.product.toString(),
+        );
+
+        if (existingCartItemIndex !== -1) {
+          // if element already exists, update it
+          if (updateCartItem.quantity === 0) {
+            // if the quantity equals to 0, remove the item from the cart
+            existingCart.cartItems.splice(existingCartItemIndex, 1);
+          } else {
+            // update the quantity
+            existingCart.cartItems[existingCartItemIndex].quantity =
+              updateCartItem.quantity;
+          }
+        } else {
+          //create new cart item
+          existingCart.cartItems.push(updateCartItem);
+        }
       });
     }
-    const total_price: number = await calculateTotalPrice({
-      order: order,
+
+    const total = await calculateTotalPrice({
+      cart: existingCart,
       productService: this.productService,
     });
 
-    order.set({ total_price: total_price });
-    const updatedOrder = await order.save();
-    return updatedOrder;
-  }
-
-  async removeItemFromCart(productId: string): Promise<Order> {
-    const orderId = '66017292853ed44d15e30595';
-
-    const order = await this.orderService.getOrderById(orderId);
-
-    // Find the index of the product in the cart
-    const productIndex = order.products.findIndex(
-      (item) => item.product_id.toString() === productId,
-    );
-
-    // If the product is not in the cart, throw an error
-    if (productIndex === -1) {
-      throw new HttpException(
-        'Product not found in cart',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    // Remove the product from the cart
-    order.products.splice(productIndex, 1);
-
-    const total_price: number = await calculateTotalPrice({
-      order: order,
-      productService: this.productService,
-    });
-    order.set({ total_price: total_price });
-
-    // Save the updated order back to the database
-    const updatedOrder = await order.save();
-    return updatedOrder;
-  }
-
-  async decrementItemFromCart(productId: string): Promise<Order> {
-    const orderId = '66017292853ed44d15e30595';
-
-    const order = await this.orderService.getOrderById(orderId);
-
-    // Find the index of the product in the cart
-    const productIndex = order.products.findIndex(
-      (item) => item.product_id.toString() === productId,
-    );
-
-    // If the product is not in the cart, throw an error
-    if (productIndex === -1) {
-      throw new HttpException(
-        'Product not found in cart',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    // Decrement the quantity of the product in the cart
-    const product = order.products[productIndex];
-    if (product.quantity > 1) {
-      product.quantity--; // Decrement quantity by 1
-    } else {
-      // If the quantity is already 1, remove the product from the cart
-      order.products.splice(productIndex, 1);
-    }
-
-    const total_price: number = await calculateTotalPrice({
-      order: order,
-      productService: this.productService,
-    });
-    order.set({ total_price: total_price });
-
-    // Save the updated order back to the database
-    const updatedOrder = await order.save();
-    return updatedOrder;
-  }
-
-  async incrementItemInCart(productId: string): Promise<any> {
-    const orderId = '66017292853ed44d15e30595';
-    const order = await this.orderService.getOrderById(orderId);
-
-    // Find the index of the product in the cart
-    const productIndex = order.products.findIndex(
-      (item) => item.product_id.toString() === productId,
-    );
-
-    // If the product is not in the cart, throw an error
-    if (productIndex === -1) {
-      throw new HttpException(
-        'Product not found in cart',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    // Increment the quantity of the product in the cart
-    const product = order.products[productIndex];
-    product.quantity++; // Increment quantity by 1
-
-    const total_price: number = await calculateTotalPrice({
-      order: order,
-      productService: this.productService,
-    });
-
-    order.set({ total_price: total_price });
-
-    // Save the updated order back to the database
-    const updatedOrder = await order.save();
-    return updatedOrder;
-  }
-
-  async updateCartItem(productId: string, quantity: number): Promise<Order> {
-    const orderId = '66017292853ed44d15e30595';
-    const order = await this.orderService.getOrderById(orderId);
-
-    // Find the index of the product in the cart
-    const productIndex = order.products.findIndex(
-      (item) => item.product_id.toString() === productId,
-    );
-
-    // If the product is not in the cart, throw an error
-    if (productIndex === -1) {
-      throw new HttpException(
-        'Product not found in cart',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    // Update the quantity of the product in the cart
-    order.products[productIndex].quantity = quantity;
-
-    const total_price: number = await calculateTotalPrice({
-      order: order,
-      productService: this.productService,
-    });
-    order.set({ total_price: total_price });
-
-    // Save the updated order back to the database
-    const updatedOrder = await order.save();
-    return updatedOrder;
-  }
-  async clearCart(): Promise<Order> {
-    const orderId = '66017292853ed44d15e30595';
-
-    const order = await this.orderService.getOrderById(orderId);
-
-    // Clear all products from the cart
-    order.products = [];
-
-    order.set({ total_price: 0 });
-    const updatedOrder = await order.save();
-    return updatedOrder;
+    existingCart.set({ total });
+    return existingCart.save();
   }
 }

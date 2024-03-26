@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
-import { Types } from 'mongoose';
 
 export class CreateProductDTO {
   @IsNotEmpty()
@@ -23,7 +22,7 @@ export class CreateProductDTO {
   availableQuantity: number;
 
   @IsNotEmpty()
-  category: Types.ObjectId;
+  category: string;
 }
 
 export type UpdateProductDTO = Partial<CreateProductDTO>;

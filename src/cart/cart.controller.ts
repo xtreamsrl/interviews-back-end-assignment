@@ -1,103 +1,116 @@
 import {
-  Body,
   Controller,
-  Delete,
-  HttpException,
-  HttpStatus,
-  Param,
   Post,
+  Body,
+  HttpStatus,
+  HttpException,
+  Get,
+  Param,
+  Delete,
   Put,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { ItemDto } from '../orders/dtos/create-order.dto';
+import { Cart } from '../models/cart.model';
+import { CreateCartDto, UpdateCartDTO } from './dtos/create-cart.dto';
+import { AuthGuard } from '../guard/auth.guard';
+import { Request } from 'express';
+import { AdminGuard } from '../guard/admin.guard';
 
-@Controller('cart')
+@Controller('carts')
 export class CartController {
   constructor(private cartService: CartService) {}
 
-  @Post('add-item')
-  async addProductToCart(@Body() productDto: ItemDto): Promise<any> {
-    const cart = await this.cartService.addItemToCart(productDto);
-    return cart;
+  @UseGuards(AuthGuard)
+  @Get('user')
+  async getCartsByUser(@Req() req: Request) {
+    const user = req['user'];
+    const carts = await this.cartService.getCartsByUserId(user.user._id);
+    return {
+      message: 'Carts retrieved successfully',
+      carts: carts,
+    };
   }
 
-  @Delete('remove-item/:productId')
-  async removeItemFromCart(
-    @Param('productId') productId: string,
-  ): Promise<any> {
-    try {
-      const updatedOrder = await this.cartService.removeItemFromCart(productId);
-      return updatedOrder;
-    } catch (error) {
-      throw new HttpException(
-        'Failed to remove item from cart',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @UseGuards(AuthGuard, AdminGuard)
+  @Get()
+  async getAllCarts() {
+    const carts = await this.cartService.getAllCarts();
+    return {
+      message: 'All carts retrieved successfully',
+      carts: carts,
+    };
+  }
+  @UseGuards(AuthGuard)
+  @Post()
+  async createCart(@Body() CartItemDto: CreateCartDto, @Req() req: Request) {
+    const user = req['user'];
+    const newCart: Cart = await this.cartService.createCart(
+      user.user._id,
+      CartItemDto,
+    );
+    return {
+      message: 'Cart created successfully',
+      cart: newCart,
+    };
   }
 
-  @Delete('decrement-item/:productId')
-  async decrementItemFromCart(
-    @Param('productId') productId: string,
-  ): Promise<any> {
-    try {
-      const updatedOrder =
-        await this.cartService.decrementItemFromCart(productId);
-      return updatedOrder;
-    } catch (error) {
-      throw new HttpException(
-        'Failed to decrement item quantity in cart',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async findCartById(@Param('id') cartId: string, @Req() req: Request) {
+    const user = req['user'];
+
+    const cart = await this.cartService.findCartById(
+      user.user._id.toString(),
+      cartId,
+    );
+    if (!cart) {
+      throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
-  }
-  @Put('increment-item/:productId')
-  async incrementItemInCart(
-    @Param('productId') productId: string,
-  ): Promise<any> {
-    try {
-      const updatedOrder =
-        await this.cartService.incrementItemInCart(productId);
-      return updatedOrder;
-    } catch (error) {
-      throw new HttpException(
-        'Failed to increment item quantity in cart',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return {
+      message: 'Cart found successfully',
+      cart: cart,
+    };
   }
 
-  @Put('update-item/:productId/:quantity')
-  async updateCartItem(
-    @Param('productId') productId: string,
-    @Param('quantity') quantity: number,
-  ): Promise<any> {
-    try {
-      const updatedOrder = await this.cartService.updateCartItem(
-        productId,
-        quantity,
-      );
-      return updatedOrder;
-    } catch (error) {
-      throw new HttpException(
-        'Failed to update item quantity in cart',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  async deleteCart(@Param('id') cartId: string, @Req() req: Request) {
+    const user = req['user'];
+
+    const deletedCart = await this.cartService.deleteCart(
+      user.user._id.toString(),
+      cartId,
+    );
+    if (!deletedCart) {
+      throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
+    return {
+      message: 'Cart deleted successfully',
+      cart: deletedCart,
+    };
   }
-  @Delete('clear-cart')
-  async clearCart(): Promise<any> {
-    try {
-      const updatedOrder = await this.cartService.clearCart();
-      return {
-        message: 'Cart cleared successfully',
-        order: updatedOrder,
-      };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to clear cart',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+
+  @UseGuards(AuthGuard)
+  @Put(':id')
+  async updateCart(
+    @Param('id') cartId: string,
+    @Body() updateCartDto: UpdateCartDTO,
+    @Req() req: Request,
+  ) {
+    const user = req['user'];
+    const updatedCart = await this.cartService.updateCart(
+      user.user._id.toString(),
+      cartId,
+      updateCartDto,
+    );
+    if (!updatedCart) {
+      throw new HttpException('Cart not found', HttpStatus.NOT_FOUND);
     }
+    return {
+      message: 'Cart updated successfully',
+      cart: updatedCart,
+    };
   }
 }

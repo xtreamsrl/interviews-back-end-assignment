@@ -3,9 +3,11 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from '../models/order.model';
+import { CartModule } from '../cart/cart.module';
 
 @Module({
   imports: [
+    CartModule,
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
   ],
   controllers: [OrdersController],

@@ -6,21 +6,35 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from '../models/order.model';
-import { CreateOrderDto, UpdateOrderDTO } from './dtos/create-order.dto';
+import { CreateOrderDto } from './dtos/create-order.dto';
 import { AuthGuard } from '../guard/auth.guard';
+import { Request } from 'express';
+import mongoose from 'mongoose';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private ordersService: OrdersService) {}
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  async getOrderById(@Param('id') id: string): Promise<Order> {
-    const order = await this.ordersService.getOrderById(id);
+  async getOrderById(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ): Promise<Order> {
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid)
+      throw new HttpException(
+        'Invalid mongoose Id, Order not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    const user = req['user'];
+    const order = await this.ordersService.getOrderById(user.user._id, id);
+
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
@@ -29,31 +43,24 @@ export class OrdersController {
 
   @UseGuards(AuthGuard)
   @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    try {
-      const createdOrder = await this.ordersService.createOrder(createOrderDto);
-      return createdOrder;
-    } catch (error) {
-      throw new HttpException(
-        'Failed to create order',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  @UseGuards(AuthGuard)
-  @Put(':id')
-  async updateOrder(
-    @Param('id') id: string,
-    @Body() updateOrderDTO: UpdateOrderDTO,
+  async createOrder(
+    @Body() createOrderDto: CreateOrderDto,
+    @Req() req: Request,
   ): Promise<Order> {
-    const updatedOrder = await this.ordersService.updateOrder(
-      id,
-      updateOrderDTO,
+    const isValid = mongoose.Types.ObjectId.isValid(createOrderDto.cart);
+    if (!isValid)
+      throw new HttpException(
+        'Invalid mongoose Id, cart not found',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const user = req['user'];
+
+    const createdOrder = await this.ordersService.createOrder(
+      user.user._id.toString(),
+      createOrderDto,
     );
-    if (!updatedOrder) {
-      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
-    }
-    return updatedOrder;
+
+    return createdOrder;
   }
 }

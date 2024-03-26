@@ -52,7 +52,7 @@ export class ProductsController {
     if (!isValid)
       throw new HttpException(
         'Invalid mongoose Id, Product not found',
-        HttpStatus.NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
       );
     const product = await this.productsService.getProductById(id);
     if (!product) {
@@ -91,7 +91,7 @@ export class ProductsController {
     if (!isValid)
       throw new HttpException(
         'Invalid mongoose Id, Product not found to update',
-        HttpStatus.NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
       );
     const updatedProduct = await this.productsService.updateProduct(
       id,

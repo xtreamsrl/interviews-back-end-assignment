@@ -23,7 +23,7 @@ export class AuthService {
       throw new Error('Invalid password');
     }
     const payload = {
-      user,
+      ...user,
     };
 
     //after need to implement the refresh token

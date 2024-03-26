@@ -6,17 +6,14 @@ import mongoose from 'mongoose';
   timestamps: true,
 })
 export class Order extends Document {
-  @Prop({ type: String, required: true })
-  user_id: string;
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'User', required: true })
+  user: mongoose.Schema.Types.ObjectId;
 
-  @Prop({
-    type: [{ product_id: mongoose.Types.ObjectId, quantity: Number }],
-    required: true,
-  })
-  products: { product_id: mongoose.Types.ObjectId; quantity: number }[];
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'Cart', required: true })
+  cart: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: Number, required: true, default: 0 })
-  total_price: number;
+  @Prop({ type: Number, default: 0 })
+  totalPrice: number;
 
   @Prop({
     type: String,
