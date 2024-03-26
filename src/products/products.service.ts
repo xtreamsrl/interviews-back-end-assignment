@@ -13,7 +13,7 @@ export class ProductsService {
     private readonly categoryService: CategoriesService,
   ) {}
 
-  async getProducts(page?: number, limit?: number): Promise<Product[]> {
+  async getProducts(page?: number, limit?: number) {
     if (page <= 0 || limit <= 0) {
       throw new HttpException(
         'Invalid page or limit value.',
@@ -22,7 +22,11 @@ export class ProductsService {
     }
     const skip = (page - 1) * limit;
     const products = await this.productModel.find().skip(skip).limit(limit);
-    return products;
+    const total = await this.productModel.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages) throw new Error('page not found');
+    return { products, total, totalPages };
   }
 
   async addProduct(createProductDTO: CreateProductDTO): Promise<Product> {

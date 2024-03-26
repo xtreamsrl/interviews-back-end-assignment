@@ -30,13 +30,21 @@ export class ProductsController {
     @Query('limit') limit: number,
     @Res() res: Response,
   ) {
-    const products = await this.productsService.getProducts(page, limit);
+    const { products, total, totalPages } =
+      await this.productsService.getProducts(page, limit);
     if (!products)
       throw new HttpException('Products not found', HttpStatus.NOT_FOUND);
 
-    return res
-      .status(HttpStatus.OK)
-      .json({ message: 'get products successfully', data: products });
+    return res.status(HttpStatus.OK).json({
+      message: 'get products successfully',
+      data: products,
+      ...(page &&
+        limit && {
+          totalCount: total,
+          currentPage: page,
+          totalPage: totalPages,
+        }),
+    });
   }
 
   @Get('/search')
